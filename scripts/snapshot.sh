@@ -5,8 +5,12 @@ set -eu
 cd "$(dirname "$0")/.."
 mkdir -p data
 
+# env -u: config overlays injected via PI_CONFIG_FILES would leak this machine's
+# settings into the snapshot; --profile alone does not shield against them.
+OMP="env -u PI_CONFIG_FILES omp --profile guide-snapshot"
+
 omp --version | sed 's|^omp/||' > data/version.txt
-omp --profile guide-snapshot config list --json | jq -S . > data/settings.json
+$OMP config list --json | jq -S . > data/settings.json
 omp help 2>&1 | sed -n '/^COMMANDS/,/^$/p' > data/subcommands.txt
 omp --help 2>&1 | sed -n '/^FLAGS/,/^EXAMPLES/p' > data/flags.txt
 
