@@ -242,7 +242,7 @@
       idx=null,items=[],sel=0;
   function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function load(){
-    fetch('{{ "/search.json" | relative_url }}')
+    fetch('{{ "/search.json" | relative_url }}?{{ site.github.build_revision | slice: 0, 8 }}')
       .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
       .then(function(d){idx=d;render(search(input.value));})
       .catch(function(){idx=null;});
