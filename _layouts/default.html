@@ -146,6 +146,55 @@
   footer a{color:var(--muted);border-bottom:none}
   footer a:hover{color:var(--ink)}
   ::selection{background:var(--accent);color:#000}
+
+  .search-btn{
+    display:flex;align-items:center;gap:.45rem;cursor:pointer;
+    font-family:var(--mono);font-size:.66rem;font-weight:500;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    background:rgba(255,255,255,.04);border:1px solid var(--hair-2);
+    border-radius:7px;padding:.4rem .6rem;white-space:nowrap;
+  }
+  .search-btn:hover{color:var(--ink);border-color:var(--hair)}
+  .search-btn kbd{
+    font-family:var(--mono);font-size:.62rem;color:var(--faint);
+    border:1px solid var(--hair-2);border-radius:4px;padding:.05rem .3rem;
+  }
+  .search-overlay{
+    position:fixed;inset:0;z-index:50;
+    background:rgba(0,0,0,.6);backdrop-filter:blur(6px);
+    display:flex;justify-content:center;align-items:flex-start;
+    padding:12vh 1rem 1rem;
+  }
+  .search-panel{
+    width:min(640px,100%);background:var(--panel);
+    border:1px solid var(--hair);border-radius:12px;overflow:hidden;
+    box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(242,74,184,.06);
+  }
+  #search-input{
+    width:100%;background:none;border:none;outline:none;
+    font-family:var(--mono);font-size:.95rem;color:var(--ink);
+    padding:1rem 1.15rem;border-bottom:1px solid var(--hair-2);
+  }
+  #search-input::placeholder{color:var(--faint)}
+  .search-results{max-height:52vh;overflow-y:auto}
+  .search-results .sr{
+    display:block;padding:.7rem 1.15rem;text-decoration:none;
+    border-bottom:1px solid var(--hair-2);border-left:2px solid transparent;
+  }
+  .search-results .sr:last-child{border-bottom:none}
+  .search-results .sr b{
+    display:block;font-family:var(--mono);font-size:.72rem;font-weight:500;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin-bottom:.15rem;
+  }
+  .search-results .sr span{display:block;font-size:.82rem;color:var(--muted);line-height:1.55}
+  .search-results .sr.on{background:rgba(255,255,255,.04);border-left-color:var(--accent)}
+  .search-results .sr:hover{background:rgba(255,255,255,.03)}
+  .search-results mark{background:var(--accent);color:#000;border-radius:2px;padding:0 .1em}
+  .search-results .sr-none{
+    margin:0;padding:.9rem 1.15rem;font-family:var(--mono);
+    font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+  }
+  @media (max-width:720px){.search-btn kbd{display:none}}
 </style>
 </head>
 <body>
@@ -163,7 +212,17 @@
     <a href="{{ '/traps.html' | relative_url }}">Traps</a>
     <a class="ext" href="https://github.com/HugoLopes45/omp-guide">GitHub</a>
   </nav>
+  <button id="search-btn" class="search-btn" type="button" aria-label="Search the guide">
+    Search <kbd>&#8984;K</kbd>
+  </button>
 </div></div>
+
+<div id="search" class="search-overlay" hidden>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+    <input id="search-input" type="search" placeholder="Search the guide&hellip;" autocomplete="off" spellcheck="false">
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
 
 <main><div class="wrap">
 {{ content }}
@@ -173,6 +232,67 @@
   <span>omp guide &middot; MIT &middot; not affiliated with oh-my-pi</span>
   <span><a href="https://omp.sh">omp.sh</a> &middot; <a href="https://github.com/can1357/oh-my-pi">upstream</a> &middot; <a href="https://github.com/HugoLopes45/omp-guide">source</a></span>
 </div></footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('search-btn'),
+      overlay=document.getElementById('search'),
+      input=document.getElementById('search-input'),
+      list=document.getElementById('search-results'),
+      idx=null,items=[],sel=0;
+  function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function open(){
+    overlay.hidden=false;input.value='';render([]);input.focus();
+    if(!idx)fetch('{{ "/search.json" | relative_url }}').then(function(r){return r.json();}).then(function(d){idx=d;});
+  }
+  function close(){overlay.hidden=true;}
+  function search(q){
+    q=q.trim().toLowerCase();
+    if(!q||!idx)return[];
+    var out=[];
+    for(var i=0;i<idx.length;i++){
+      var p=idx[i],hay=(p.title+' '+p.content).toLowerCase(),at=hay.indexOf(q);
+      if(at<0)continue;
+      var ci=p.content.toLowerCase().indexOf(q),snip='';
+      if(ci>=0){
+        var a=Math.max(0,ci-70),b=Math.min(p.content.length,ci+q.length+110);
+        snip=(a>0?'…':'')+esc(p.content.slice(a,ci))
+          +'<mark>'+esc(p.content.slice(ci,ci+q.length))+'</mark>'
+          +esc(p.content.slice(ci+q.length,b))+(b<p.content.length?'…':'');
+      }
+      out.push({title:p.title,url:p.url,snip:snip,rank:(p.title.toLowerCase().indexOf(q)>=0?0:1)+at/1e7});
+    }
+    out.sort(function(x,y){return x.rank-y.rank;});
+    return out.slice(0,8);
+  }
+  function render(res){
+    items=res;sel=0;
+    list.innerHTML=res.map(function(r,i){
+      return '<a class="sr'+(i===0?' on':'')+'" href="'+r.url+'"><b>'+esc(r.title)+'</b><span>'+r.snip+'</span></a>';
+    }).join('')||(input.value.trim()?'<p class="sr-none">No matches</p>':'');
+  }
+  function move(d){
+    if(!items.length)return;
+    sel=(sel+d+items.length)%items.length;
+    var els=list.querySelectorAll('.sr');
+    for(var i=0;i<els.length;i++)els[i].classList.toggle('on',i===sel);
+    els[sel].scrollIntoView({block:'nearest'});
+  }
+  input.addEventListener('input',function(){render(search(input.value));});
+  input.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){e.preventDefault();move(1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();move(-1);}
+    else if(e.key==='Enter'&&items[sel])location.href=items[sel].url;
+  });
+  document.addEventListener('keydown',function(e){
+    if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();overlay.hidden?open():close();}
+    else if(e.key==='/'&&overlay.hidden&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();open();}
+    else if(e.key==='Escape'&&!overlay.hidden)close();
+  });
+  btn.addEventListener('click',open);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
+})();
+</script>
 
 </body>
 </html>

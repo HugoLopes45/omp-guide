@@ -1,0 +1,12 @@
+---
+layout: null
+---
+[
+{% assign first = true %}{% for p in site.pages %}{% if p.url == "/search.json" or p.url contains "/data/" %}{% continue %}{% endif %}{% unless p.url contains ".html" or p.url == "/" %}{% continue %}{% endunless %}{% unless first %},{% endunless %}{% assign first = false %}
+  {
+    "title": {{ p.title | default: "omp guide" | jsonify }},
+    "url": {{ p.url | relative_url | jsonify }},
+    "content": {{ p.content | markdownify | strip_html | normalize_whitespace | jsonify }}
+  }
+{% endfor %}
+]
