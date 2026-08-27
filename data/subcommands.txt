@@ -1,0 +1,41 @@
+COMMANDS
+  acp            Run Oh My Pi as an ACP (Agent Client Protocol) server over stdio
+  agents         Manage bundled task agents
+  auth-broker    Manage the omp auth-broker (credential vault)
+  auth-gateway   Run an auth-gateway forward proxy backed by the configured broker
+  bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads
+  browser-relay  Run the local CDP relay that lets the browser tool drive your own Chrome tabs
+  cleanse        Detect and fix project diagnostics with weighted parallel subagents
+  commit         Generate a commit message and update changelogs
+  completions    Print a shell completion script (bash, zsh, or fish)
+  compress       Rewrite a text file into the dense prompt register, reporting what it drops
+  config         Manage configuration settings
+  dry-balance    Dry-run OAuth account balancing across random session ids
+  gallery        Preview tool renderers across streaming, in-progress, success, and failure states
+  gc             Run storage garbage collection
+  git            Interactive fullscreen git UI: split diff viewer, staging sidebar, and commit composer
+  grep           Test grep tool
+  grievances     View, clean, or push reported tool issues (auto-QA grievances)
+  if-bench       Benchmark instruction following and working memory: one cached thread of glyph array actions with a moving cat-sound directive
+  images         Inspect, diagnose, probe, and purge image publication backends
+  install        Install or link an extension package (alias of `plugin install`/`plugin link`)
+  join           Join a shared collab session (same as /join)
+  models         List, search, and refresh available models
+  plugin         Manage plugins (install, uninstall, list, etc.)
+  ps             List and control daemon-supervised background processes (logs, stop, kill, restart)
+  read           Show what the read tool will return for a path, URL, or internal URI
+  render         Draw a session's entire thread through the production transcript pipeline (with repaint timing)
+  say            Synthesize text with the local TTS engine and play it through the speakers
+  search         Test web search providers
+  setup          Run onboarding setup or install dependencies for optional features
+  share          Share a saved session via an encrypted link (same as /share)
+  shell          Interactive shell console
+  ssh            Manage SSH host configurations
+  stats          View usage statistics
+  tiny-models    Download tiny local models (session titles + memory)
+  token          Get the API key or OAuth token for a provider
+  ttsr           Inspect and test Time-Traveling Stream Rules (TTSR)
+  update         Check for and install updates
+  usage          Show provider usage limits for every authenticated account
+  worktree       List or clear agent-managed git worktrees (~/.omp/wt)
+

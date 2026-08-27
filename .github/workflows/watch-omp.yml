@@ -1,0 +1,52 @@
+name: watch omp releases
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install latest omp
+        run: bun install -g @oh-my-pi/pi-coding-agent
+
+      - name: Snapshot the omp surface
+        run: sh scripts/snapshot.sh
+
+      - name: Commit drift and open a review issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add -A data
+          if git diff --cached --quiet; then
+            echo "No drift since the last snapshot."
+            exit 0
+          fi
+          NEW_VERSION=$(cat data/version.txt)
+          {
+            echo "A new omp release changed the surface this guide documents. Review the diff below and update the affected pages."
+            echo
+            echo "Release notes: https://github.com/can1357/oh-my-pi/releases"
+            echo
+            echo '```diff'
+            git diff --cached -- data | head -400
+            echo '```'
+          } > /tmp/issue-body.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "data: snapshot omp ${NEW_VERSION}"
+          git push
+          gh issue create \
+            --title "omp ${NEW_VERSION}: documented surface changed" \
+            --body-file /tmp/issue-body.md \
+            --label omp-release
