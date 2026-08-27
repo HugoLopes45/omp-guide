@@ -16,7 +16,7 @@
 
 ## Autonomy traps
 
-**`yolo` is the default.** Fresh install, zero prompts: reads, writes, and shell all auto-approve. Decide your posture on purpose. See [Settings](settings.md#approval-the-first-decision).
+**`yolo` is the default.** Fresh install, zero prompts: reads, writes, and shell all auto-approve. Decide your posture on purpose. See [Settings](settings.md#2-which-approval-mode-should-i-choose).
 
 **Unlimited provider concurrency meets 32 subagents.** `providers.maxInFlightRequests` defaults to unlimited and `task.maxConcurrency` to 32. One enthusiastic fan-out can 429-storm a provider and burn a rate-limit window in minutes. Cap every provider you pay for.
 

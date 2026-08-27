@@ -1,15 +1,35 @@
-# Settings
+<div class="settings-hero">
 
-*Verified with `omp config list` against the release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). 350+ keys exist; this page covers the model of how config works, the decisions that matter, and a sane starter file. The full machine-readable list lives in [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json), regenerated automatically from each omp release.*
+# Settings, demystified
 
-## How config resolves
+This page answers four first questions: where a value comes from, which approval mode to choose, what to put in a first config, and what to add later. *Verified against the release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt).*
 
-Precedence, lowest to highest:
+<dl class="settings-stats">
+  <div><dt>350+</dt><dd>settings</dd></div>
+  <div><dt>5</dt><dd>resolution layers</dd></div>
+  <div><dt>3</dt><dd>first decisions</dd></div>
+</dl>
 
-```
-defaults  <  ~/.omp/agent/config.yml  <  <cwd>/.omp/config.yml  <  --config overlays  <  CLI flags
-   (global)                              (project, cwd ONLY)       (also PI_CONFIG_FILES)
-```
+</div>
+
+<nav class="settings-path" aria-label="Settings onboarding">
+  <a href="#1-where-does-a-value-come-from">Where values come from</a>
+  <a href="#2-which-approval-mode-should-i-choose">Choose an approval mode</a>
+  <a href="#3-what-belongs-in-my-first-config">Copy a small baseline</a>
+  <a href="#4-what-should-i-add-later">Add power when needed</a>
+</nav>
+
+## 1. Where does a value come from?
+
+Values resolve from lowest to highest priority:
+
+<ol class="resolution-ladder">
+  <li><strong>Schema default</strong></li>
+  <li><strong>Global config</strong>, <code>~/.omp/agent/config.yml</code></li>
+  <li><strong>Project config</strong>, <code>&lt;cwd&gt;/.omp/config.yml</code></li>
+  <li><strong>Ordered <code>--config</code> overlays</strong>, including <code>PI_CONFIG_FILES</code></li>
+  <li><strong>CLI and runtime overrides</strong></li>
+</ol>
 
 Three facts people learn the hard way:
 
@@ -27,118 +47,77 @@ omp config path          # which directory the global config lives in
 /settings                # same thing with a UI
 ```
 
-## Approval: the first decision
+## 2. Which approval mode should I choose?
 
-**The default is `yolo`: reads, writes, and shell commands all auto-approve.** That is a deliberate default for a tool built to run fast, and it is your call to keep or narrow. Three layers, each beating the one before:
+Fresh installs default to `yolo`. Start with `write`: read and workspace-write tools stay automatic, while exec-tier actions still require approval.
+
+<div class="approval-options">
+  <section>
+    <h3><code>always-ask</code></h3>
+    <p>Approve each tool action yourself.</p>
+  </section>
+  <section>
+    <h3><code>write</code> recommended</h3>
+    <p>Keep reads and workspace writes automatic. Approve exec-tier actions.</p>
+  </section>
+  <section>
+    <h3><code>yolo</code></h3>
+    <p>Auto-approve reads, writes, and shell commands.</p>
+  </section>
+</div>
+
+The mode is the baseline. `tools.approval` overrides it per tool, and the first matching `bash.patterns` rule overrides the bash policy:
 
 ```yaml
 tools:
-  approvalMode: yolo        # baseline: always-ask | write | yolo
+  approvalMode: write
   approval:
-    bash: prompt            # per-tool policy: beats the mode, in every mode
-bash:
-  patterns:                 # per-command rules: beat the tool policy; first match wins
-    - { match: "git status*",       approval: allow }
-    - { match: "rm -r*",            approval: deny }
-    - { match: "git push --force*", approval: deny }
-```
-
-Facts that shape a good ruleset:
-
-- Under `yolo`, `allow` rules are inert (everything is allowed anyway). Only `deny` and `prompt` rules matter. Keep the allow-list anyway if you might ever switch to `write` or `always-ask`.
-- `deny` blocks outright; `prompt` requires your explicit approval. For a command that is legitimate somewhere ("cargo run", "terraform apply"), `prompt` beats `deny`.
-- Deny and prompt rules inspect the segments of compound commands; allow rules must match the whole command.
-- The `eval` tool (Python/JS cells) can spawn shells at the exec tier. Under `yolo`, bash patterns do not gate it; use `tools.approval.eval` if that matters to you.
-
-## Defaults worth knowing
-
-| Key | Default | Why you would touch it |
-|---|---|---|
-| `tools.approvalMode` | `yolo` | the autonomy dial; decide it on purpose |
-| `defaultThinkingLevel` | `high` | `auto` lets a classifier pick per turn; `ultrathink` escalates one turn |
-| `task.maxConcurrency` | `32` | how many subagents run at once |
-| `providers.maxInFlightRequests` | `{}` = **unlimited** | per-provider cap on concurrent LLM requests, shared across local omp processes. Unlimited + 32 subagents = 429 storms; cap your paid providers |
-| `task.isolation.mode` | `none` | set `auto` before fanning out workers that write |
-| `memory.backend` | `off` | `mnemopi` = local SQLite memory; nothing persists until you turn this on |
-| `advisor.enabled` | `false` | second model reviewing every turn; needs `modelRoles.advisor` too |
-| `secrets.enabled` | `false` | redacts credential-shaped tokens before text reaches providers; cheap defense, turn it on |
-| `lsp.diagnosticsOnWrite` | `true` | the agent sees type errors as it writes |
-| `lsp.formatOnWrite` | `false` | only enable in repos with deterministic formatting |
-| `edit.mode` | `hashline` | content-hash anchored edits; rejected, never misapplied |
-| `edit.enforceSeenLines` | `false` | reject edits to lines never displayed by a read; read-before-write discipline |
-| `tools.intentTracing` | `true` | agent states intent before each call; observability, at a token cost |
-| `tools.maxTimeout` | `0` = unlimited | a finite cap (600-900s) stops a subagent from requesting a 2h wait on a hung command |
-| `tools.abortOnFabricatedResult` | `true` | stop the model the moment it hallucinates a tool result; keep it |
-| `retry.fallbackChains` | `{}` | where to go on a 429, per role or `provider/*` |
-| `retry.usageAwareFallback` | `false` | route around near-exhausted coding-plan accounts before they hard-fail |
-| `includeWorkspaceTree` | `false` | keep it off: tree churn busts prompt caching every session |
-| `temperature`, `topP`, ... | `-1` = provider default | do not tune sampling globally without a controlled eval |
-
-## A sane starter config
-
-Global (`~/.omp/agent/config.yml`), provider-agnostic. Adjust models to what you have.
-
-```yaml
-modelRoles:
-  default: anthropic/claude-sonnet-5      # the daily driver
-  smol: anthropic/claude-haiku-4-5        # fan-out, titles, cheap grunt work
-  slow: anthropic/claude-opus-5:high      # the hard calls
-  plan: anthropic/claude-opus-5
-
-defaultThinkingLevel: auto
-
-retry:
-  fallbackChains:
-    default: [openai/gpt-5.2]             # a 429 degrades instead of stopping you
-
-providers:
-  maxInFlightRequests:                    # cap every provider you pay for
-    anthropic: 4
-    openai: 4
-
-task:
-  isolation:
-    mode: auto                            # parallel writers stop colliding
-  maxConcurrency: 8                       # raise once you know your rate limits
-
-secrets:
-  enabled: true
-
-tools:
-  maxTimeout: 900
-
+    bash: prompt
 bash:
   patterns:
-    - { match: "sudo *",            approval: deny }
-    - { match: "rm -r*",            approval: deny }
-    - { match: "rm -f*",            approval: deny }
-    - { match: "git push --force*", approval: deny }
-    - { match: "git push -f*",      approval: deny }
-    - { match: "git reset --hard*", approval: deny }
-    - { match: "git clean*",        approval: deny }
-    - { match: "dd *",              approval: deny }
-    - { match: "npm publish*",      approval: deny }
-    - { match: "cargo publish*",    approval: deny }
-    - { match: "terraform destroy*", approval: deny }
-    - { match: "terraform apply*",  approval: prompt }
-    - { match: "kubectl delete*",   approval: prompt }
+    - { match: "git status*", approval: allow }
+    - { match: "rm -r*", approval: deny }
 ```
 
-Why these:
+Under `yolo`, only `deny` and `prompt` rules change bash behavior. `deny` blocks, `prompt` asks, and allow rules must match the full command while deny and prompt inspect compound-command segments. **`eval` needs its own approval policy:** Python and JavaScript cells can spawn exec-tier shells, so use `tools.approval.eval` when that boundary matters.
 
-- **Fallback chain**: one entry turns a hard stop into a degrade.
-- **`maxInFlightRequests`**: the single most-missed setting. The default is unlimited, `task.maxConcurrency` defaults to 32, and the caps are shared across all local omp processes. Without caps, one fan-out can burn a rate-limit window in minutes.
-- **Isolation `auto`**: picks the fastest backend for your filesystem (CoW clones, overlayfs, worktree fallback). Without it, parallel writers clobber each other.
-- **The deny list**: destructive, irreversible, or publishing. Everything else stays fast.
+## 3. What belongs in my first config?
 
-## Growing past the starter
+| Key | Shipped default | Start here because |
+|---|---|---|
+| `tools.approvalMode` | `yolo` | `write` keeps routine reads and workspace writes fast while asking before exec-tier actions. |
+| `defaultThinkingLevel` | `high` | `auto` chooses a level per turn instead of fixing every task at `high`. |
+| `secrets.enabled` | `false` | `true` redacts credential-shaped tokens before they reach providers. |
 
-When you want more, in rough order of payoff:
+```yaml
+defaultThinkingLevel: auto
+secrets:
+  enabled: true
+tools:
+  approvalMode: write
+```
 
-1. `memory.backend: mnemopi`, then `/memory stats` after a day. The agent opens tomorrow knowing your repo.
-2. `advisor.enabled: true` plus `modelRoles.advisor`: a second model reviewing every turn. Real quality lift, real second bill; measure with `omp stats -s`.
-3. `edit.enforceSeenLines: true`: read-before-write discipline, more tool calls, fewer blind edits.
-4. `retry.usageAwareFallback: true` if you run multiple coding-plan accounts.
-5. Per-project `.omp/config.yml` for repo-specific overrides (remember: cwd only, arrays replace).
+## 4. What should I add later?
 
-The full key list with types and defaults lives in [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json), and `omp config list --json` prints the same thing for your install, your values included.
+<div class="later-grid">
+  <section>
+    <h3>Cross-session recall</h3>
+    <p><code>memory.backend</code> ships <code>off</code>. Enable it when you want recall across sessions. Read <a href="tips.md#memory-is-off-until-you-flip-it">memory tips</a> first.</p>
+  </section>
+  <section>
+    <h3>Parallel writers</h3>
+    <p><code>task.isolation.mode</code> ships <code>none</code>. Set it to <code>auto</code> before parallel agents edit. Read <a href="multi-agent.md#before-anything-isolation">isolation guidance</a>.</p>
+  </section>
+  <section>
+    <h3>Rate-limit control</h3>
+    <p><code>task.maxConcurrency</code> ships <code>32</code>; <code>providers.maxInFlightRequests</code> is unlimited. Cap both before broad fan-out. Read <a href="traps.md#autonomy-traps">autonomy traps</a>.</p>
+  </section>
+  <section>
+    <h3>Provider fallback</h3>
+    <p><code>retry.fallbackChains</code> ships empty. Add it after choosing a real backup provider.</p>
+  </section>
+</div>
+
+## Full reference
+
+The full key catalog, types, and defaults live in [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json). Run `omp config list --json` for your effective values, or open `/settings` for the same lookup in the UI.

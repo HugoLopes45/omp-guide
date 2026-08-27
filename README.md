@@ -32,7 +32,7 @@ omp
 
 Then, in order:
 
-1. Run `omp config get tools.approvalMode`. It says `yolo`: every tool call auto-approves, shell included. Decide deliberately whether you want that on this machine (see [Settings](settings.md#approval-the-first-decision)).
+1. Run `omp config get tools.approvalMode`. It says `yolo`: every tool call auto-approves, shell included. Decide deliberately whether you want that on this machine (see [Settings](settings.md#2-which-approval-mode-should-i-choose)).
 2. Type `/plan` before your first non-trivial task. The agent goes read-only and writes a plan file; read it before approving.
 3. When the agent does something annoying, type `/omfg`. It forges a permanent correction rule from your complaint.
 4. Press `Shift+Tab` to change the thinking level, `Ctrl+P` to cycle models.
