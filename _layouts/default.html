@@ -241,9 +241,15 @@
       list=document.getElementById('search-results'),
       idx=null,items=[],sel=0;
   function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function load(){
+    fetch('{{ "/search.json" | relative_url }}')
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(function(d){idx=d;render(search(input.value));})
+      .catch(function(){idx=null;});
+  }
   function open(){
     overlay.hidden=false;input.value='';render([]);input.focus();
-    if(!idx)fetch('{{ "/search.json" | relative_url }}').then(function(r){return r.json();}).then(function(d){idx=d;});
+    if(!idx)load();
   }
   function close(){overlay.hidden=true;}
   function search(q){
