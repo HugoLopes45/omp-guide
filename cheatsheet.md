@@ -18,7 +18,7 @@ Verified against `omp help`; the live list is snapshotted in [`data/subcommands.
 | `omp commit` | generate a commit message and update changelogs |
 | `omp completions <shell>` | print a completion script (bash, zsh, fish) |
 | `omp compress` | rewrite a text file into the dense prompt register |
-| `omp config <list\|get\|set\|reset\|path>` | manage settings |
+| `omp config <list/get/set/reset/path>` | manage settings |
 | `omp gallery` | preview tool renderers |
 | `omp gc` | storage garbage collection; dry run until `--apply` |
 | `omp git` | fullscreen git UI: split diff, staging, commit composer |
@@ -29,7 +29,7 @@ Verified against `omp help`; the live list is snapshotted in [`data/subcommands.
 | `omp models` | list, search, refresh available models |
 | `omp plugin <...>` | install, uninstall, list, marketplace |
 | `omp ps` | list and control daemon-supervised background processes |
-| `omp read <path\|url>` | show what the `read` tool returns for a path or internal URI |
+| `omp read <path/url>` | show what the `read` tool returns for a path or internal URI |
 | `omp render` | replay a session through the transcript pipeline |
 | `omp say` | local text-to-speech |
 | `omp search` | test web-search providers |
@@ -52,11 +52,11 @@ The ones you will actually use. `omp --help` has the rest.
 | Flag | Effect |
 |---|---|
 | `-p` / `--print` | non-interactive: answer one prompt and exit |
-| `--mode <text\|json\|rpc\|rpc-ui>` | output mode; pair `json` with `-p` for scripting |
+| `--mode <text/json/rpc/rpc-ui>` | output mode; pair `json` with `-p` for scripting |
 | `--model <selector>` | fuzzy: `opus`, `gpt-5.2`, `openai/gpt-5.2` |
 | `--smol` / `--slow` / `--plan` | override that **role's model**. `--plan` is not plan mode |
-| `--thinking <off..max\|auto>` | reasoning level for the session |
-| `--approval-mode <always-ask\|write\|yolo>` | override `tools.approvalMode` for this session |
+| `--thinking <off..max/auto>` | reasoning level for the session |
+| `--approval-mode <always-ask/write/yolo>` | override `tools.approvalMode` for this session |
 | `--auto-approve` | force yolo for this session |
 | `--tools read,edit,bash` | pin the enabled tool set; unknown names hard-error |
 | `-c` / `-r [id]` | continue latest in this cwd / resume by id or picker |
@@ -76,13 +76,13 @@ The ones you will actually use. `omp --help` has the rest.
 |---|---|
 | Model and effort | `/model` `/models` `/switch` `/fast` `/prewalk` |
 | Modes | `/plan` `/plan-review` `/vibe` `/goal` `/guided-goal` `/loop` `/pause` `/force` |
-| Review | `/review` `/advisor on\|off\|status\|dump\|configure` |
+| Review | `/review` `/advisor on/off/status/dump/configure` |
 | Agents and jobs | `/agents` `/jobs` `/tan` `/btw` `/queue` |
-| Context | `/context` `/compact` `/shake` `/handoff` `/memory view\|stats\|diagnose\|clear\|enqueue` |
+| Context | `/context` `/compact` `/shake` `/handoff` `/memory view/stats/diagnose/clear/enqueue` |
 | Session | `/new` `/clear` `/reset` `/fresh` `/drop` `/resume` `/fork` `/branch` `/tree` `/rename` `/retry` |
 | Share | `/collab` `/join` `/leave` `/share` `/export` `/copy` |
 | Rules and plugins | `/omfg` `/extensions` `/plugins` `/reload-plugins` `/marketplace` `/skill:<name>` |
-| Integrations | `/mcp add\|list\|test\|reconnect\|reload` `/ssh` `/login` `/logout` `/browser` `/live` |
+| Integrations | `/mcp add/list/test/reconnect/reload` `/ssh` `/login` `/logout` `/browser` `/live` |
 | Info | `/hotkeys` `/tools` `/settings` `/providers` `/usage` `/stats` `/changelog` `/todo` `/debug` `/exit` |
 
 `/vibe`, `/goal` and `/loop` are session modes, not one-shot commands: they stay on until toggled off. `/tan` runs a full background agent on tangential work; `/btw` asks an ephemeral side question without polluting your context.
