@@ -1,6 +1,6 @@
 # Getting started
 
-*Verified against the omp release in [`data/version.txt`](data/version.txt); drift from newer releases is tracked automatically in the issues.*
+*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt); drift from newer releases is tracked automatically in the issues.*
 
 ## Install
 

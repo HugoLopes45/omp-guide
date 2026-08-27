@@ -1,10 +1,10 @@
 # Cheat sheet
 
-*Verified against the omp release in [`data/version.txt`](data/version.txt). Keybindings and slash commands come from omp's docs; run `/hotkeys` and `/settings` for the live truth on your install.*
+*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). Keybindings and slash commands come from omp's docs; run `/hotkeys` and `/settings` for the live truth on your install.*
 
 ## CLI subcommands
 
-Verified against `omp help`; the live list is snapshotted in [`data/subcommands.txt`](data/subcommands.txt).
+Verified against `omp help`; the live list is snapshotted in [`data/subcommands.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/subcommands.txt).
 
 | Command | Effect |
 |---|---|

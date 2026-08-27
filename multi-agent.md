@@ -1,6 +1,6 @@
 # Multi-agent
 
-*Verified against the omp release in [`data/version.txt`](data/version.txt). This is the leverage jump: one dev thinking in parallel ships like three. It is also where the sharpest traps live; read [Traps](traps.md) before your first fan-out.*
+*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). This is the leverage jump: one dev thinking in parallel ships like three. It is also where the sharpest traps live; read [Traps](traps.md) before your first fan-out.*
 
 ## Before anything: isolation
 

@@ -1,6 +1,6 @@
 # Settings
 
-*Verified with `omp config list` against the release in [`data/version.txt`](data/version.txt). 350+ keys exist; this page covers the model of how config works, the decisions that matter, and a sane starter file. The full machine-readable list lives in [`data/settings.json`](data/settings.json), regenerated automatically from each omp release.*
+*Verified with `omp config list` against the release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). 350+ keys exist; this page covers the model of how config works, the decisions that matter, and a sane starter file. The full machine-readable list lives in [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json), regenerated automatically from each omp release.*
 
 ## How config resolves
 
@@ -141,4 +141,4 @@ When you want more, in rough order of payoff:
 4. `retry.usageAwareFallback: true` if you run multiple coding-plan accounts.
 5. Per-project `.omp/config.yml` for repo-specific overrides (remember: cwd only, arrays replace).
 
-The full key list with types and defaults lives in [`data/settings.json`](data/settings.json), and `omp config list --json` prints the same thing for your install, your values included.
+The full key list with types and defaults lives in [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json), and `omp config list --json` prints the same thing for your install, your values included.

@@ -1,6 +1,6 @@
 # Traps
 
-*Verified against the omp release in [`data/version.txt`](data/version.txt). Every entry here has cost someone real time. Several were discovered the hard way on a live install.*
+*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). Every entry here has cost someone real time. Several were discovered the hard way on a live install.*
 
 ## Config traps
 

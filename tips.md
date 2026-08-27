@@ -1,6 +1,6 @@
 # Tips and tricks
 
-*Verified against the omp release in [`data/version.txt`](data/version.txt). Ordered roughly by payoff.*
+*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). Ordered roughly by payoff.*
 
 ## Route by role, not by hope
 
