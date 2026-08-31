@@ -417,7 +417,7 @@
   "composer.shape": {
     "description": "Visual layout of the input editor and status line",
     "type": "string",
-    "value": "box"
+    "value": "band"
   },
   "computer.display": {
     "description": "Composite all displays or select a native display id",
@@ -514,6 +514,11 @@
   },
   "display.showTokenUsage": {
     "description": "Show per-turn token usage on assistant messages",
+    "type": "boolean",
+    "value": false
+  },
+  "display.showTurnTime": {
+    "description": "Show the total prompt-to-yield time (including tool calls) on assistant message usage rows",
     "type": "boolean",
     "value": false
   },
@@ -625,7 +630,7 @@
   "extendedContext": {
     "description": "Use premium long-context windows on models that bill extra past a threshold (e.g. GPT-5.6 1M charges 2x input above 272K); off caps them at the standard-pricing window",
     "type": "boolean",
-    "value": true
+    "value": false
   },
   "extensionHandlers.toolCallTimeoutMs": {
     "description": "Positive finite active-work timeout for extension tool_call handlers; invalid values use 30000ms, and time awaiting OMP-owned dialogs does not count",
@@ -1180,7 +1185,7 @@
     "value": 300
   },
   "memory.backend": {
-    "description": "Off, local summary pipeline, Mnemopi SQLite, or Hindsight remote memory",
+    "description": "Off, local summary pipeline, Mnemopi SQLite, Hindsight remote memory, or Sharpshooter",
     "type": "enum",
     "value": "off"
   },
@@ -1729,6 +1734,20 @@
     "type": "enum",
     "value": "blob"
   },
+  "sharpshooter.injectionTokenLimit": {
+    "description": "",
+    "type": "number",
+    "value": 15000
+  },
+  "sharpshooter.intervalMinutes": {
+    "description": "",
+    "type": "number",
+    "value": 5
+  },
+  "sharpshooter.model": {
+    "description": "Model selector for extraction/consolidation, empty = smol role",
+    "type": "string"
+  },
   "shellMinimizer.enabled": {
     "description": "Compress verbose shell output (git, npm, cargo, etc.) before returning it to the agent",
     "type": "boolean",
@@ -1914,7 +1933,7 @@
   "statusLine.compactThinkingLevel": {
     "description": "Show the thinking level as a single icon on the model name instead of a separate ` · <level>` suffix.",
     "type": "boolean",
-    "value": false
+    "value": true
   },
   "statusLine.contextLine": {
     "description": "How the line between the left and right segments reflects context usage (box composer only)",

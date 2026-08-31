@@ -11,7 +11,7 @@ COMMANDS
   compress       Rewrite a text file into the dense prompt register, reporting what it drops
   config         Manage configuration settings
   dry-balance    Dry-run OAuth account balancing across random session ids
-  gallery        Preview tool renderers across streaming, in-progress, success, and failure states
+  gallery        Preview tool, composer, and status-line renderers in a deterministic visual gallery
   gc             Run storage garbage collection
   git            Interactive fullscreen git UI: split diff viewer, staging sidebar, and commit composer
   grep           Test grep tool
