@@ -37,5 +37,5 @@ COMMANDS
   ttsr           Inspect and test Time-Traveling Stream Rules (TTSR)
   update         Check for and install updates
   usage          Show provider usage limits for every authenticated account
-  worktree       List or clear agent-managed git worktrees (~/.omp/wt)
+  worktree       Add, list, or clear git worktrees (clone-first when enabled)
 

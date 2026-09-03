@@ -273,7 +273,7 @@
   "commands.enableClaudeUser": {
     "description": "Load commands from ~/.claude/commands/",
     "type": "boolean",
-    "value": true
+    "value": false
   },
   "commands.enableOpencodeProject": {
     "description": "Load commands from .opencode/commands/",
@@ -283,7 +283,7 @@
   "commands.enableOpencodeUser": {
     "description": "Load commands from ~/.config/opencode/commands/",
     "type": "boolean",
-    "value": true
+    "value": false
   },
   "commit.cacheEnabled": {
     "description": "",
@@ -528,9 +528,9 @@
     "value": true
   },
   "doubleEscapeAction": {
-    "description": "Action when pressing Escape twice with empty editor",
+    "description": "What pressing Escape twice with an empty editor does: open the transcript rewind selector, open the session tree, or nothing",
     "type": "enum",
-    "value": "tree"
+    "value": "rewind"
   },
   "edit.autoRepair.enabled": {
     "description": "When an edit breaks a file's AST parse, ask the smol model to fix the broken region (validated by re-parse; falls back to a warning)",
@@ -567,6 +567,11 @@
     "type": "enum",
     "value": "hashline"
   },
+  "edit.recoverInlineEdits": {
+    "description": "Execute edit payloads the model emits as plain text by converting them into edit tool calls",
+    "type": "boolean",
+    "value": true
+  },
   "edit.streamingAbort": {
     "description": "Abort streaming edit tool calls when patch preview fails",
     "type": "boolean",
@@ -578,6 +583,11 @@
     "value": true
   },
   "enabledModels": {
+    "description": "",
+    "type": "array",
+    "value": []
+  },
+  "enabledProviders": {
     "description": "",
     "type": "array",
     "value": []
@@ -1004,6 +1014,11 @@
     "type": "number",
     "value": 120000
   },
+  "isolation.backend": {
+    "description": "Backend used for subagent isolation and worktree cloning",
+    "type": "enum",
+    "value": "auto"
+  },
   "julia.interpreter": {
     "description": "Optional path to an exact Julia executable. When set, automatic Julia runtime discovery is skipped.",
     "type": "string",
@@ -1379,7 +1394,7 @@
     "value": true
   },
   "power.sleepPrevention": {
-    "description": "Prevent macOS sleep during active sessions. Each level is cumulative — it adds the flags of all lower levels.",
+    "description": "Prevent the system sleeping during active sessions. Each level is cumulative — it adds the flags of all lower levels.",
     "type": "enum",
     "value": "idle"
   },
@@ -1790,6 +1805,11 @@
     "type": "boolean",
     "value": true
   },
+  "skillful": {
+    "description": "List available skills in the system prompt; disable to save context and toggle per-session with /skillful",
+    "type": "boolean",
+    "value": true
+  },
   "skills.customDirectories": {
     "description": "",
     "type": "array",
@@ -1813,12 +1833,12 @@
   "skills.enableClaudeUser": {
     "description": "",
     "type": "boolean",
-    "value": true
+    "value": false
   },
   "skills.enableCodexUser": {
     "description": "",
     "type": "boolean",
-    "value": true
+    "value": false
   },
   "skills.enablePiProject": {
     "description": "",
@@ -2065,15 +2085,15 @@
     "type": "enum",
     "value": "generic"
   },
+  "task.isolation.enabled": {
+    "description": "Run subagents in an isolated copy of the checkout and integrate their changes afterwards",
+    "type": "boolean",
+    "value": false
+  },
   "task.isolation.merge": {
     "description": "How isolated task changes are integrated (patch apply or branch merge)",
     "type": "enum",
     "value": "patch"
-  },
-  "task.isolation.mode": {
-    "description": "Isolation backend for subagents. \"auto\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback).",
-    "type": "enum",
-    "value": "none"
   },
   "task.maxConcurrency": {
     "description": "Maximum number of subagents running concurrently",
@@ -2390,6 +2410,11 @@
     "type": "number",
     "value": 8
   },
+  "tui.reactions": {
+    "description": "Invite the agent to react to your message with an emoji badge on its bubble",
+    "type": "boolean",
+    "value": true
+  },
   "tui.renderMermaid": {
     "description": "Render Mermaid fenced code blocks as ASCII diagrams",
     "type": "boolean",
@@ -2438,5 +2463,10 @@
   "worktree.base": {
     "description": "Base directory for agent-managed worktrees — task-isolation copies, `github` PR checkouts, and `omp worktree` cleanup all live here. Unset uses ~/.omp/wt. Must be an absolute or ~-relative path; relative paths are ignored. The OMP_WORKTREE_DIR env var overrides this.",
     "type": "string"
+  },
+  "worktree.clone": {
+    "description": "New worktrees from `github pr_checkout` and `git worktree add` in bash start as a copy-on-write clone of the current checkout so ignored build artifacts (node_modules, target) carry over; falls back to a plain checkout when the filesystem cannot clone",
+    "type": "boolean",
+    "value": true
   }
 }
