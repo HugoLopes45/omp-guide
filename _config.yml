@@ -2,6 +2,7 @@ title: omp guide
 description: The missing beginner guide to oh-my-pi (omp) - cheat sheets, tips and tricks, sane configs, and the traps.
 url: "https://hugolopes45.github.io"
 baseurl: "/omp-guide"
+data_dir: data
 
 defaults:
   - scope:

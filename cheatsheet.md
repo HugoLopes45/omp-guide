@@ -19,7 +19,7 @@ Verified against `omp help`; the live list is snapshotted in [`data/subcommands.
 | `omp completions <shell>` | print a completion script (bash, zsh, fish) |
 | `omp compress` | rewrite a text file into the dense prompt register |
 | `omp config <list/get/set/reset/path>` | manage settings |
-| `omp gallery` | preview tool renderers |
+| `omp gallery` | preview tool, composer, and status-line renderers in a deterministic visual gallery |
 | `omp gc` | storage garbage collection; dry run until `--apply` |
 | `omp git` | fullscreen git UI: split diff, staging, commit composer |
 | `omp grievances` | view/clean/push reported tool issues |
@@ -29,7 +29,7 @@ Verified against `omp help`; the live list is snapshotted in [`data/subcommands.
 | `omp models` | list, search, refresh available models |
 | `omp plugin <...>` | install, uninstall, list, marketplace |
 | `omp ps` | list and control daemon-supervised background processes |
-| `omp read <path/url>` | show what the `read` tool returns for a path or internal URI |
+| `omp read <path/url>[:selector]` | show what the `read` tool returns; selectors include `:-N` and video frame/time selectors |
 | `omp render` | replay a session through the transcript pipeline |
 | `omp say` | local text-to-speech |
 | `omp search` | test web-search providers |
@@ -43,7 +43,7 @@ Verified against `omp help`; the live list is snapshotted in [`data/subcommands.
 | `omp ttsr` | inspect and test time-traveling stream rules |
 | `omp update` | check for and install updates |
 | `omp usage` | provider usage limits for every authed account |
-| `omp worktree` / `omp wt` | list or clear agent-managed worktrees (`~/.omp/wt`) |
+| `omp worktree` / `omp wt` | add, list, or clear git worktrees (clone-first when enabled) |
 
 ## Launch flags
 
@@ -77,15 +77,15 @@ The ones you will actually use. `omp --help` has the rest.
 | Model and effort | `/model` `/models` `/switch` `/fast` `/prewalk` |
 | Modes | `/plan` `/plan-review` `/vibe` `/goal` `/guided-goal` `/loop` `/pause` `/force` |
 | Review | `/review` `/advisor on/off/status/dump/configure` |
-| Agents and jobs | `/agents` `/jobs` `/tan` `/btw` `/queue` |
+| Agents and jobs | `/agents` `/hub` `/jobs` `/tan` `/btw` `/queue` |
 | Context | `/context` `/compact` `/shake` `/handoff` `/memory view/stats/diagnose/clear/enqueue` |
-| Session | `/new` `/clear` `/reset` `/fresh` `/drop` `/resume` `/fork` `/branch` `/tree` `/rename` `/retry` |
-| Share | `/collab` `/join` `/leave` `/share` `/export` `/copy` |
-| Rules and plugins | `/omfg` `/extensions` `/plugins` `/reload-plugins` `/marketplace` `/skill:<name>` |
+| Session | `/new` `/clear` `/reset` `/fresh` `/drop` `/resume` `/fork` `/branch` `/rewind` `/tree` `/wt` `/worktree` `/rename` `/retry` |
+| Share | `/collab` `/join` `/leave` `/share` `/export` `/copy` `/copy link` `/open` |
+| Rules and plugins | `/omfg` `/extensions` `/plugins` `/reload-plugins` `/marketplace` `/skill:<name>` `/skillful` |
 | Integrations | `/mcp add/list/test/reconnect/reload` `/ssh` `/login` `/logout` `/browser` `/live` |
-| Info | `/hotkeys` `/tools` `/settings` `/providers` `/usage` `/stats` `/changelog` `/todo` `/debug` `/exit` |
+| Info | `/hotkeys` `/tools` `/settings` `/providers` `/usage` `/stats` `/trace` `/changelog` `/todo` `/debug` `/exit` |
 
-`/vibe`, `/goal` and `/loop` are session modes, not one-shot commands: they stay on until toggled off. `/tan` runs a full background agent on tangential work; `/btw` asks an ephemeral side question without polluting your context.
+`/branch` (`/rewind`) branches the current session at a selected user turn; `/tree` opens the child-session tree. `/vibe`, `/goal` and `/loop` are session modes, not one-shot commands: they stay on until toggled off. `/tan` runs a full background agent on tangential work; `/btw` asks an ephemeral side question without polluting your context.
 
 ## Keybindings
 
@@ -107,12 +107,12 @@ Remaps live in `~/.omp/agent/keybindings.yml`, not in `config.yml`. `/hotkeys` s
 | `Alt+A` | open the agent hub |
 | `Ctrl+R` | search prompt history |
 | `Ctrl+V` | paste image |
-| `Esc` / `Ctrl+C` / `Ctrl+D` | interrupt / clear / exit |
+| `Option-click` | position the prompt cursor at the clicked location |
 | hold `Space` | push-to-talk speech-to-text |
 
 ## Internal URL schemes
 
-Everything the agent touches is a path. `read` accepts all of these.
+Everything the agent touches is a path. `read` accepts all of these, plus selectors such as `:-N` for the last N lines, `:raw:-60` for raw output, and frame/time selectors for video.
 
 | Scheme | Example | Returns |
 |---|---|---|

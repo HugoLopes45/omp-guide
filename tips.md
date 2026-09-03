@@ -74,7 +74,7 @@ The `eval` tool runs persistent Python and JS cells with shared state, structure
 
 ## Import your history from other tools
 
-`omp --from-claude` / `omp --from-codex` import a Claude Code or Codex session with history intact. omp also reads `CLAUDE.md`, `AGENTS.md`, Cursor MDC, `.clinerules` and Copilot instructions natively. Switching costs nothing.
+`omp --from-claude` / `omp --from-codex` import a Claude Code or Codex session with history intact. omp also reads project files such as `CLAUDE.md`, `AGENTS.md`, Cursor MDC, `.clinerules` and Copilot instructions natively. Standalone `CLAUDE.md` files in the project or its ancestors load alongside `AGENTS.md`; user-level provider config sources are opt-in through `enabledProviders`. Switching costs nothing.
 
 ## `omp cleanse` for the diagnostics pile
 

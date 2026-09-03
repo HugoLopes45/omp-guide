@@ -4,7 +4,7 @@
 
 ## Config traps
 
-**Project settings do not walk up.** `<cwd>/.omp/config.yml` is read from the directory you launch in, and only there. A config in a parent directory is silently ignored. Context files (`AGENTS.md`, `RULES.md`) do walk up; settings do not.
+**Project settings do not walk up.** `<cwd>/.omp/config.yml` is read from the directory you launch in, and only there. A config in a parent directory is silently ignored. Context files (`AGENTS.md`, `RULES.md`, and standalone `CLAUDE.md`) do walk up; settings do not.
 
 **Arrays replace wholesale, per layer.** Config arrays (`bash.patterns`, `compaction.methodOrder`, ...) never merge across layers. A project file that defines `bash.patterns` deletes every global guard for that project. If you rely on global guardrail arrays, load them as a `--config` overlay (resolves after project config) and know that GUI-spawned omp never sources your shell profile, so env-driven overlays do not reach it.
 
@@ -26,7 +26,7 @@
 
 **`--plan` is not plan mode.** The flag sets which model the `plan` *role* uses. Plan mode is `/plan` or `Alt+Shift+P`. The launch flag that does start a session planning is `--plan-yolo`.
 
-**`isolated: true` silently does not exist until you enable isolation.** The field appears on task spawns only once `task.isolation.mode` is set (ships as `none`). It also needs a git repo and plan mode off. Fanning out writers without it means siblings clobber each other.
+**`isolated: true` does nothing until you enable isolation.** Set `task.isolation.enabled` to `true` (ships as `false`) before spawning writers. `isolation.backend` ships as `auto`; a git repo and plan mode off are still required. Fanning out writers without isolation means siblings clobber each other.
 
 **`/vibe`, `/goal`, `/loop` are modes, not commands.** They stay on until toggled off, and vibe is exclusive with plan and goal, even paused ones. Leaving vibe kills every worker.
 

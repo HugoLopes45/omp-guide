@@ -5,7 +5,7 @@
 This page answers four first questions: where a value comes from, which approval mode to choose, what to put in a first config, and what to add later. *Verified against the release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt).*
 
 <dl class="settings-stats">
-  <div><dt>350+</dt><dd>settings</dd></div>
+  <div><dt>480+</dt><dd>settings</dd></div>
   <div><dt>5</dt><dd>resolution layers</dd></div>
   <div><dt>3</dt><dd>first decisions</dd></div>
 </dl>
@@ -33,7 +33,7 @@ Values resolve from lowest to highest priority:
 
 Three facts people learn the hard way:
 
-1. **Project settings do not walk up ancestors.** Only context files (`AGENTS.md`, `RULES.md`) do. A `.omp/config.yml` in a parent directory of where you launched is silently ignored.
+1. **Project settings do not walk up ancestors.** Context files (`AGENTS.md`, `RULES.md`, and standalone `CLAUDE.md`) do. A `.omp/config.yml` in a parent directory of where you launched is silently ignored.
 2. **Arrays replace wholesale, per layer.** They do not merge. If a project `.omp/config.yml` defines `bash.patterns`, it deletes every global pattern for that project. If you keep global guardrails in an array, either never define that array at project level, or load the global version as a `--config` overlay (via `PI_CONFIG_FILES` in your shell profile) so it resolves after project config. Caveat: GUI-spawned omp (ACP, launchd) never sources your shell profile, so an env-based overlay does not reach it.
 3. **`omp config get <key>` shows the merged, effective value** from wherever your shell runs it, overlays included. When a change seems to have no effect, ask which layer you edited and which layer wins.
 
@@ -106,7 +106,7 @@ tools:
   </section>
   <section>
     <h3>Parallel writers</h3>
-    <p><code>task.isolation.mode</code> ships <code>none</code>. Set it to <code>auto</code> before parallel agents edit. Read <a href="multi-agent.md#before-anything-isolation">isolation guidance</a>.</p>
+    <p><code>task.isolation.enabled</code> ships <code>false</code>. Set it to <code>true</code> before parallel agents edit. <code>isolation.backend</code> ships <code>auto</code> and selects the available backend. Read <a href="multi-agent.md#before-anything-isolation">isolation guidance</a>.</p>
   </section>
   <section>
     <h3>Rate-limit control</h3>
@@ -120,4 +120,60 @@ tools:
 
 ## Full reference
 
-The full key catalog, types, and defaults live in [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json). Run `omp config list --json` for your effective values, or open `/settings` for the same lookup in the UI.
+The full key catalog stays sourced from [`data/settings.json`](https://github.com/HugoLopes45/omp-guide/blob/main/data/settings.json). Search the list below for your install's shipped defaults, or run `omp config list --json` for your effective values.
+
+<div class="settings-reference" data-settings-reference data-settings-count="{{ site.data.settings.size }}">
+  <label for="settings-search">Search settings</label>
+  <input id="settings-search" type="search" placeholder="approvalMode, memory, concurrency..." autocomplete="off">
+  <p class="settings-reference-count" role="status" aria-live="polite" data-settings-reference-count></p>
+  <details>
+    <summary>Browse all {{ site.data.settings.size }} settings</summary>
+    <div class="settings-reference-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Key</th><th scope="col">Shipped default</th><th scope="col">Description</th></tr>
+        </thead>
+        <tbody>
+          {% assign settings = site.data.settings | sort %}
+          {% for setting in settings %}
+          <tr data-settings-reference-row>
+            <th scope="row"><code>{{ setting[0] | escape }}</code></th>
+            <td data-label="Shipped default">{% if setting[1].value == nil %}<span class="settings-reference-none">No shipped default</span>{% elsif setting[1].type == "string" or setting[1].type == "enum" %}<code>{{ setting[1].value | escape }}</code>{% else %}<code>{{ setting[1].value | jsonify | escape }}</code>{% endif %}</td>
+            <td data-label="Description">{{ setting[1].description | default: "No description provided." | escape }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+</div>
+
+<script>
+(() => {
+  const reference = document.querySelector("[data-settings-reference]");
+  const input = reference.querySelector("input");
+  const details = reference.querySelector("details");
+  const rows = Array.from(reference.querySelectorAll("[data-settings-reference-row]"));
+  const total = Number(reference.dataset.settingsCount);
+  const count = reference.querySelector("[data-settings-reference-count]");
+
+  const filterRows = () => {
+    const query = input.value.trim().toLowerCase();
+    let matches = 0;
+
+    for (const row of rows) {
+      const matchesQuery = row.textContent.toLowerCase().includes(query);
+      row.hidden = !matchesQuery;
+      matches += Number(matchesQuery);
+    }
+
+    count.textContent = query
+      ? `${matches} settings match "${input.value.trim()}".`
+      : `${total} settings available.`;
+    if (query) details.open = true;
+  };
+
+  input.addEventListener("input", filterRows);
+  filterRows();
+})();
+</script>

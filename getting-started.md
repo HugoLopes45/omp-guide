@@ -46,7 +46,7 @@ Never commit or push unless I explicitly ask.
 Do not edit generated files.
 ```
 
-Already have `CLAUDE.md`, `AGENTS.md`, Cursor rules, or `.clinerules`? omp reads them natively. Nothing to migrate; native `.omp` files win on collision.
+Project files such as `CLAUDE.md`, `AGENTS.md`, Cursor rules, or `.clinerules` load natively. Standalone `CLAUDE.md` files in the project or its ancestors load alongside `AGENTS.md`; user-level provider config sources are opt-in through `enabledProviders`. Nothing to migrate; native `.omp` files win on collision.
 
 ## Attach things
 
@@ -54,7 +54,7 @@ Already have `CLAUDE.md`, `AGENTS.md`, Cursor rules, or `.clinerules`? omp reads
 omp @spec.md @screenshot.png "implement this"
 ```
 
-`@path` attaches files to the first message. Inside the TUI, paste images with `Ctrl+V`.
+`@path` attaches files to the first message, including images and videos. Inside the TUI, paste images with `Ctrl+V`; `read` can inspect videos with ffmpeg, and selectors such as `:412` or `:1h5m42s` extract a frame.
 
 ## Headless, when you are ready
 

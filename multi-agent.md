@@ -5,10 +5,10 @@
 ## Before anything: isolation
 
 ```sh
-omp config set task.isolation.mode auto    # ships as "none"
+omp config set task.isolation.enabled true    # ships as false; backend defaults to auto
 ```
 
-With isolation `none` (the default), parallel workers edit the same working tree and clobber each other. `auto` gives each isolated worker its own workspace (CoW clone, overlayfs, or a git worktree, whatever your filesystem supports) and returns **patches** instead of raw edits. Requirements: a git repo, and plan mode off.
+With isolation disabled (the default), parallel workers edit the same working tree and can clobber each other. Enable it to give each worker its own workspace (CoW clone, overlayfs, or a git worktree, whatever your filesystem supports) and return **patches** instead of raw edits. `isolation.backend` defaults to `auto` and selects the available backend. Requirements: a git repo, and plan mode off.
 
 ## The task tool: batch-shaped fan-out
 
@@ -28,11 +28,11 @@ One call, one shared `context`, one entry per worker:
 You rarely write this JSON yourself; the agent does. Your job is the vocabulary around it:
 
 - **`orchestrate`**, standalone and lowercase in your prompt, tells the agent to delegate independent work to parallel subagents and verify each phase. **`workflowz`** asks for a deterministic multi-subagent workflow.
-- Results are paths, not prose: `read agent://Callers` for a worker's output, `read agent://Callers/findings.0.path` for one field, `read history://Migrate` for its transcript.
+- Results are usually paths, but read-only workers can also return a detailed `report` field and relay structured result fields. Use `read agent://Callers` for a worker's output, `read agent://Callers/findings.0.path` for one field, or `read history://Migrate` for its transcript.
 - `/agents` (or `Alt+A`) is the control center; watch the fleet run.
 - Up to `task.maxConcurrency` run at once (default 32; cap your providers first, see [Settings](settings.md#defaults-worth-knowing-18x)).
 
-Bundled agents: `scout`, `reviewer`, `security-reviewer`, `designer`, `librarian`, `sonic`, `task`.
+Bundled agents: `scout`, `reviewer`, `security-reviewer`, `librarian`, `sonic`, `task`.
 
 ## Your own agent is a markdown file
 
@@ -58,6 +58,7 @@ Read its package.json, grep the source for each dependency, and run
 ```
 
 The `output` schema is the point: the worker's result is validated against it, so the parent reads a real object instead of parsing text. `model: "@smol"` keeps a fleet of these cheap.
+Rules can target an agent with `agents` frontmatter; use `omp ttsr list` to enumerate rules and `omp ttsr test --agent <name>` to evaluate agent-scoped matches.
 
 ## The advisor: a second model on every turn
 

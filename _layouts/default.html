@@ -669,6 +669,101 @@
       margin: 0 0 1.2rem;
     }
 
+    .settings-reference {
+      margin: 0 0 1.2rem;
+      padding: 1rem;
+      background: var(--panel);
+      border: 1px solid var(--hair);
+      border-radius: 10px;
+    }
+
+    .settings-reference label {
+      display: block;
+      margin: 0 0 .45rem;
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .settings-reference input {
+      width: 100%;
+      min-height: 44px;
+      padding: .65rem .8rem;
+      background: var(--panel-2);
+      border: 1px solid var(--hair);
+      border-radius: 7px;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .settings-reference input:focus-visible,
+    .settings-reference summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .settings-reference input::placeholder {
+      color: var(--faint);
+    }
+
+    .settings-reference-count {
+      min-height: 1.5em;
+      margin: .55rem 0;
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--muted);
+    }
+
+    .settings-reference details {
+      border-top: 1px solid var(--hair-2);
+    }
+
+    .settings-reference summary {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      color: var(--ink);
+    }
+
+    .settings-reference summary::before {
+      content: "+";
+      width: 1.2rem;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    .settings-reference details[open] summary::before {
+      content: "−";
+    }
+
+    .settings-reference-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--hair-2);
+      border-radius: 8px;
+    }
+
+    .settings-reference table {
+      min-width: 680px;
+      margin: 0;
+    }
+
+    .settings-reference tr[hidden] {
+      display: none;
+    }
+
+    .settings-reference-none {
+      color: var(--faint);
+      font-style: italic;
+    }
+
     @media (max-width:720px) {
 
       .settings-hero .settings-stats,
@@ -676,9 +771,65 @@
       .resolution-ladder,
       .approval-options,
       .later-grid {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
+      }
+
+      .settings-reference {
+        padding: .8rem;
+      }
+
+      .settings-reference-scroll {
+        overflow: visible;
+        border: none;
+      }
+
+      .settings-reference table,
+      .settings-reference thead,
+      .settings-reference tbody,
+      .settings-reference tr,
+      .settings-reference th,
+      .settings-reference td {
+        display: block;
+      }
+
+      .settings-reference table {
+        min-width: 0;
+      }
+
+      .settings-reference thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      .settings-reference tr {
+        margin: 0 0 .7rem;
+        padding: .8rem;
+        background: var(--panel-2);
+        border: 1px solid var(--hair-2);
+        border-radius: 8px;
+      }
+
+      .settings-reference th,
+      .settings-reference td {
+        padding: .2rem 0;
+        border: none;
+      }
+
+      .settings-reference td::before {
+        content: attr(data-label);
+        display: block;
+        margin: .35rem 0 .1rem;
+        font-family: var(--mono);
+        font-size: .61rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--faint);
       }
     }
+
 
     @media (max-width:720px) {
       .search-btn kbd {
