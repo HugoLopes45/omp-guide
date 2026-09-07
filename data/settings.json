@@ -87,6 +87,11 @@
     "type": "number",
     "value": 5
   },
+  "bash.allowCompoundCommands": {
+    "description": "Evaluate literal && chains per command; unmatched commands use normal bash approval policy and mode",
+    "type": "boolean",
+    "value": false
+  },
   "bash.autoBackground.enabled": {
     "description": "Automatically background long-running bash commands and deliver the result later",
     "type": "boolean",
@@ -198,7 +203,7 @@
     "value": true
   },
   "browser.enabled": {
-    "description": "Enable the browser tool for scripted Chromium automation (puppeteer)",
+    "description": "Enable the browser eval prelude for scripted Chromium automation (Puppeteer)",
     "type": "boolean",
     "value": true
   },
@@ -208,7 +213,7 @@
     "value": true
   },
   "browser.relay": {
-    "description": "Drive your own Chrome tabs through the omp browser relay. Install the extension once (`omp browser-relay install`); the relay server auto-starts when the browser tool needs it. Takes precedence over Browser CDP URL; set PI_BROWSER_RELAY=0 or PI_BROWSER_RELAY=1 to override.",
+    "description": "Drive your own Chrome tabs through the omp browser relay. Install the extension once (`omp browser-relay install`); the relay server auto-starts when the browser prelude needs it. Takes precedence over Browser CDP URL; set PI_BROWSER_RELAY=0 or PI_BROWSER_RELAY=1 to override.",
     "type": "boolean",
     "value": false
   },
@@ -425,7 +430,7 @@
     "value": "all"
   },
   "computer.enabled": {
-    "description": "Enable the scriptable host-desktop control tool (screenshots, input, accessibility)",
+    "description": "Enable the scriptable host-desktop eval prelude (screenshots, input, accessibility)",
     "type": "boolean",
     "value": false
   },
@@ -607,11 +612,6 @@
     "type": "number",
     "value": 60000
   },
-  "eval.jl": {
-    "description": "Allow the eval tool to dispatch Julia cells to the persistent Julia kernel",
-    "type": "boolean",
-    "value": false
-  },
   "eval.js": {
     "description": "Allow the eval tool to dispatch JavaScript cells to the in-process runtime",
     "type": "boolean",
@@ -622,8 +622,13 @@
     "type": "boolean",
     "value": true
   },
-  "eval.rb": {
-    "description": "Allow the eval tool to dispatch Ruby cells to the persistent Ruby kernel",
+  "eval.tools.enabled": {
+    "description": "Let eval cells define tools (@tool in Python, tool(fn) in JS) that task, agent(), and workpool() subagents can call",
+    "type": "boolean",
+    "value": true
+  },
+  "eval.workpool.freshAgents": {
+    "description": "Spawn a new subagent for every workpool item instead of reusing workers or batching queued items",
     "type": "boolean",
     "value": false
   },
@@ -638,7 +643,7 @@
     "value": 1000
   },
   "extendedContext": {
-    "description": "Use premium long-context windows on models that bill extra past a threshold (e.g. GPT-5.6 1M charges 2x input above 272K); off caps them at the standard-pricing window",
+    "description": "Use larger context windows where supported; may incur premium pricing. Off keeps default or standard-pricing windows",
     "type": "boolean",
     "value": false
   },
@@ -922,6 +927,11 @@
     "type": "boolean",
     "value": true
   },
+  "images.questionTimeoutMs": {
+    "description": "Per-request timeout for the vision-model call behind read's ?q= image questions, in milliseconds. A stalled provider fails fast with a timeout error instead of blocking until manual abort. Set to 0 to disable the timeout.",
+    "type": "number",
+    "value": 300000
+  },
   "images.urls.backends": {
     "description": "Ordered destinations tried when publishing images for provider access",
     "type": "array",
@@ -989,21 +999,6 @@
     "type": "enum",
     "value": "auto"
   },
-  "inspect_image.enabled": {
-    "description": "",
-    "type": "boolean",
-    "value": false
-  },
-  "inspect_image.mode": {
-    "description": "Controls the inspect_image tool, which delegates image understanding to a vision-capable model. 'auto' exposes it only when the active model lacks native image input; 'on' always exposes it; 'off' never does.",
-    "type": "enum",
-    "value": "auto"
-  },
-  "inspect_image.timeoutMs": {
-    "description": "Per-request timeout for the inspect_image vision-model call, in milliseconds. A stalled provider fails fast with a timeout error instead of blocking until manual abort. Set to 0 to disable the timeout.",
-    "type": "number",
-    "value": 300000
-  },
   "interruptMode": {
     "description": "When steering messages interrupt tool execution",
     "type": "enum",
@@ -1018,11 +1013,6 @@
     "description": "Backend used for subagent isolation and worktree cloning",
     "type": "enum",
     "value": "auto"
-  },
-  "julia.interpreter": {
-    "description": "Optional path to an exact Julia executable. When set, automatic Julia runtime discovery is skipped.",
-    "type": "string",
-    "value": ""
   },
   "launch.enabled": {
     "description": "Enable the launch tool for supervising shared long-running project processes",
@@ -1514,12 +1504,12 @@
     "value": "online"
   },
   "providers.tinyModelDevice": {
-    "description": "ONNX execution provider for local tiny models (titles + memory). Default uses CPU-only inference. The PI_TINY_DEVICE env var overrides this.",
+    "description": "Inference backend for local tiny models (titles + memory): an ONNX execution provider, or `mlx` to download MLX weights and run them through mlx-lm on Apple silicon. Default uses CPU-only ONNX. The PI_TINY_DEVICE env var overrides this.",
     "type": "enum",
     "value": "default"
   },
   "providers.tinyModelDtype": {
-    "description": "ONNX quantization/precision for local tiny models. Default uses each model's shipped dtype (q4); lower precision is faster, higher is more faithful. The PI_TINY_DTYPE env var overrides this.",
+    "description": "ONNX quantization/precision for local tiny models. Default uses each model's shipped dtype (q4); lower precision is faster, higher is more faithful. Ignored by the MLX backend (its repos are pre-quantized 4-bit). The PI_TINY_DTYPE env var overrides this.",
     "type": "enum",
     "value": "default"
   },
@@ -1682,10 +1672,10 @@
     "type": "enum",
     "value": "confirm"
   },
-  "ruby.interpreter": {
-    "description": "Optional path to an exact Ruby executable. When set, automatic Ruby runtime discovery is skipped.",
-    "type": "string",
-    "value": ""
+  "retry.waitForUsageReset": {
+    "description": "When a provider reports usage-limit exhaustion with a reset time (5-hour or weekly quota windows on any provider), sleep until the reset instead of failing fast past retry.maxDelayMs. Waits are abortable (Esc) but also hold subagents, so leave off for unattended runs.",
+    "type": "boolean",
+    "value": false
   },
   "searxng.basicPassword": {
     "description": "",
@@ -2463,6 +2453,11 @@
   "worktree.base": {
     "description": "Base directory for agent-managed worktrees — task-isolation copies, `github` PR checkouts, and `omp worktree` cleanup all live here. Unset uses ~/.omp/wt. Must be an absolute or ~-relative path; relative paths are ignored. The OMP_WORKTREE_DIR env var overrides this.",
     "type": "string"
+  },
+  "worktree.cleanSource": {
+    "description": "When creating a worktree with `/wt`, reset tracked changes and remove untracked files from the original checkout after carrying them over",
+    "type": "boolean",
+    "value": false
   },
   "worktree.clone": {
     "description": "New worktrees from `github pr_checkout` and `git worktree add` in bash start as a copy-on-write clone of the current checkout so ignored build artifacts (node_modules, target) carry over; falls back to a plain checkout when the filesystem cannot clone",

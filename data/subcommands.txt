@@ -4,7 +4,7 @@ COMMANDS
   auth-broker    Manage the omp auth-broker (credential vault)
   auth-gateway   Run an auth-gateway forward proxy backed by the configured broker
   bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads
-  browser-relay  Run the local CDP relay that lets the browser tool drive your own Chrome tabs
+  browser-relay  Run the local CDP relay that lets the browser prelude drive your own Chrome tabs
   cleanse        Detect and fix project diagnostics with weighted parallel subagents
   commit         Generate a commit message and update changelogs
   completions    Print a shell completion script (bash, zsh, or fish)
