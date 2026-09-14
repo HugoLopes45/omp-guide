@@ -6,6 +6,7 @@ COMMANDS
   bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads
   browser-relay  Run the local CDP relay that lets the browser prelude drive your own Chrome tabs
   cleanse        Detect and fix project diagnostics with weighted parallel subagents
+  collab         List active local Collab host metadata without URLs; use collab link <instanceId|pid> to retrieve a control link (--view for view-only)
   commit         Generate a commit message and update changelogs
   completions    Print a shell completion script (bash, zsh, or fish)
   compress       Rewrite a text file into the dense prompt register, reporting what it drops

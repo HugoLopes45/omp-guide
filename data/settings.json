@@ -9,6 +9,11 @@
     "type": "number",
     "value": 3
   },
+  "advisor.maxNotesPerUpdate": {
+    "description": "Maximum non-blocker advice notes accepted per advisor prompt update (1–32; UI offers 1–5 quick picks). Blockers are exempt.",
+    "type": "number",
+    "value": 4
+  },
   "advisor.syncBacklog": {
     "description": "Pause the main agent for up to 30 seconds if the advisor falls behind by this many turns. Off disables catch-up delays.",
     "type": "enum",
@@ -207,10 +212,20 @@
     "type": "boolean",
     "value": true
   },
+  "browser.freezeOnTurnEnd": {
+    "description": "Freeze OMP-owned headless browser tabs when a turn settles so animated pages stop burning CPU/GPU while idle. Tabs unfreeze automatically on next use; pass persist:true on open to opt a tab out.",
+    "type": "boolean",
+    "value": true
+  },
   "browser.headless": {
     "description": "Launch browser in headless mode (disable to show browser UI)",
     "type": "boolean",
     "value": true
+  },
+  "browser.idleCloseSec": {
+    "description": "Close OMP-owned headless browser tabs idle longer than this many seconds (0 = never; session dispose still reaps). Applies only to OMP-launched headless tabs, never relay/CDP/spawned browsers or other sessions' tabs.",
+    "type": "number",
+    "value": 1800
   },
   "browser.relay": {
     "description": "Drive your own Chrome tabs through the omp browser relay. Install the extension once (`omp browser-relay install`); the relay server auto-starts when the browser prelude needs it. Takes precedence over Browser CDP URL; set PI_BROWSER_RELAY=0 or PI_BROWSER_RELAY=1 to override.",
@@ -249,6 +264,11 @@
     "description": "Spend a saved Codex reset automatically when it would otherwise expire within this many hours and either chat window (5h or weekly) has meaningful usage to restore (0 disables expiry salvage).",
     "type": "number",
     "value": 12
+  },
+  "collab.autoStart": {
+    "description": "Host every interactive session via collab.relayUrl as it starts and publish it to the local registry (omp collab list); rooms rotate on session switch",
+    "type": "enum",
+    "value": "off"
   },
   "collab.displayName": {
     "description": "Name shown to other collab participants (default: OS username)",
@@ -340,6 +360,11 @@
     "type": "boolean",
     "value": true
   },
+  "compaction.experimentalContextManagement": {
+    "description": "Keep persistent notes and searchable raw history across context windows. Restart to update available tools.",
+    "type": "boolean",
+    "value": false
+  },
   "compaction.handoffSaveToDisk": {
     "description": "Save generated handoff documents to markdown files for the auto-handoff flow",
     "type": "boolean",
@@ -418,6 +443,11 @@
     "description": "Notify when the agent finishes a turn",
     "type": "enum",
     "value": "on"
+  },
+  "composer.recallClearedDrafts": {
+    "description": "Keep drafts cleared with Ctrl+C in local Up/Down history until exit; disabling affects future clears",
+    "type": "boolean",
+    "value": true
   },
   "composer.shape": {
     "description": "Visual layout of the input editor and status line",
@@ -511,6 +541,11 @@
     "description": "Hide model-initiated tool calls and results from the transcript",
     "type": "boolean",
     "value": false
+  },
+  "display.pinnedAgents": {
+    "description": "Pinned live-agent jump list above the editor (off hides it; collapsed shows a few rows with an expander; full lists all)",
+    "type": "enum",
+    "value": "collapsed"
   },
   "display.shimmer": {
     "description": "Animation style for working/loading messages",
@@ -1024,6 +1059,11 @@
     "type": "enum",
     "value": "sol"
   },
+  "loop.conditionTimeoutMs": {
+    "description": "Max wait for a `/loop --while` / `--until` condition command before treating it as broken and stopping the loop. Set to 0 to wait indefinitely",
+    "type": "number",
+    "value": 30000
+  },
   "loop.mode": {
     "description": "What happens between /loop iterations before re-submitting the prompt",
     "type": "enum",
@@ -1373,6 +1413,15 @@
     "type": "enum",
     "value": "default"
   },
+  "plan.autosave": {
+    "description": "Automatically save approved plans to disk when plan mode completes",
+    "type": "boolean",
+    "value": false
+  },
+  "plan.autosaveDir": {
+    "description": "Directory for autosaved plans. Supports ~, absolute, and cwd-relative paths. Empty uses <project>/.omp/plans/.",
+    "type": "string"
+  },
   "plan.defaultOnStartup": {
     "description": "Automatically enter plan mode at the start of every new session",
     "type": "boolean",
@@ -1633,7 +1682,7 @@
     "value": true
   },
   "retry.fallbackChains": {
-    "description": "JSON object mapping model roles, model selectors (\"provider/model-id\"), or provider wildcards (\"provider/*\") to ordered fallback selectors, e.g. {\"default\":[\"openai/gpt-4o-mini\"],\"google-antigravity/*\":[\"google/*\",\"google-vertex/*\"]}. Model-oriented keys apply whenever that model/provider is active, regardless of role; a \"provider/*\" entry keeps the failing model's id and swaps the provider. An id-prefixed wildcard (\"openrouter/google/*\") re-prefixes the failing model's bare id (google-antigravity/gemini-x -> openrouter/google/gemini-x) and, used as a key, matches only that provider's ids under the prefix.",
+    "description": "JSON object mapping model roles, model selectors (\"provider/model-id\"), or provider wildcards (\"provider/*\") to ordered fallback selectors, e.g. {\"default\":[\"openai/gpt-4o-mini\"],\"google-antigravity/*\":[\"google/*\",\"google-vertex/*\"]}. Model-oriented keys apply whenever that model/provider is active, regardless of role; a \"provider/*\" entry keeps the failing model's id and swaps the provider. An id-prefixed wildcard (\"openrouter/google/*\") re-prefixes the failing model's bare id (google-antigravity/gemini-x -> openrouter/google/gemini-x) and, used as a key, matches only that provider's ids under the prefix. A fallback entry may carry an explicit thinking suffix (\"provider/model:low\", \":high\", \":max\", \":off\"); a bare entry inherits the failing turn's effort, and \"provider/*\" entries always inherit.",
     "type": "record",
     "value": {}
   },
@@ -2040,6 +2089,11 @@
     "type": "record",
     "value": {}
   },
+  "task.agentServiceTierOverrides": {
+    "description": "",
+    "type": "record",
+    "value": {}
+  },
   "task.batch": {
     "description": "Switch the task tool to its batch shape: one call carries { context, tasks[] } — one subagent per item, with an optional per-item agent (defaulting to the session spawn-policy agent), per-item isolation, and a required shared context prepended to every assignment. With async.enabled=true, each spawn runs as an independent background agent with the normal idle/parked lifecycle; otherwise the call blocks for merged results. Disable to restore the flat single-spawn schema.",
     "type": "boolean",
@@ -2295,6 +2349,16 @@
     "type": "number",
     "value": 768
   },
+  "tools.speculativeExecution.enabled": {
+    "description": "Enable the discard-safe first slice: validated local reads through direct read calls and nested eval. Network requests, provider completions, and live filesystem writes are not part of this baseline.",
+    "type": "boolean",
+    "value": false
+  },
+  "tools.speculativeExecution.maxInFlight": {
+    "description": "Maximum number of validated local reads allowed to run before normal dispatch.",
+    "type": "number",
+    "value": 2
+  },
   "tools.xdev": {
     "description": "Mount rarely-used (discoverable) tools under xd:// device URLs driven via read/write instead of shipping their schemas on every request. Sessions whose explicit tool list grants read but omits write mount devices through a device-only write transport (filesystem writes stay rejected). Disable to expose every enabled tool top-level.",
     "type": "boolean",
@@ -2400,6 +2464,11 @@
     "type": "number",
     "value": 8
   },
+  "tui.mouse": {
+    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target. Native text selection becomes Shift+drag and wheel scroll becomes Shift+wheel while on",
+    "type": "boolean",
+    "value": false
+  },
   "tui.reactions": {
     "description": "Invite the agent to react to your message with an emoji badge on its bubble",
     "type": "boolean",
@@ -2429,6 +2498,16 @@
     "description": "Show the agent run state in the terminal title's separator — an animated spinner while working (a static ':' on Windows), '>' when it's your turn, '!' when the agent is waiting on you",
     "type": "boolean",
     "value": true
+  },
+  "tui.vimMode": {
+    "description": "Modal prompt editing. Escape leaves Insert mode; Normal mode has hjkl, 0, $, ^, w, b, e, gg, G, counts, x/D/C, dd/yy, p and u; operators take motions or text objects (diw, ca(, dap); v/V start a Visual selection that y copies and d deletes",
+    "type": "boolean",
+    "value": false
+  },
+  "tui.vimModeDisplay": {
+    "description": "How the current Vim mode appears in the status line",
+    "type": "enum",
+    "value": "text"
   },
   "update.channel": {
     "description": "Update channel used by omp update and the startup update check",
