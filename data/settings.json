@@ -54,11 +54,6 @@
     "type": "number",
     "value": 100
   },
-  "async.pollWaitDuration": {
-    "description": "How long a `hub` wait watches background jobs before returning the current state. A fixed value waits that exact duration every time. `smart` adapts: it starts at 5s and lengthens with each back-to-back wait (up to 5m), then resets to 5s after about a minute without waiting.",
-    "type": "enum",
-    "value": "smart"
-  },
   "auth.broker.token": {
     "description": "",
     "type": "string"
@@ -454,6 +449,11 @@
     "type": "string",
     "value": "band"
   },
+  "composer.tokenRate": {
+    "description": "Show a live generation tok/s readout on the working row, docked right next to the session title. Estimated from streamed deltas and corrected by the provider's billed output count as each message completes.",
+    "type": "boolean",
+    "value": false
+  },
   "computer.display": {
     "description": "Composite all displays or select a native display id",
     "type": "string",
@@ -590,7 +590,7 @@
   "edit.enforceSeenLines": {
     "description": "Reject edits anchored on lines a prior read/search never displayed in full",
     "type": "boolean",
-    "value": false
+    "value": true
   },
   "edit.fuzzyMatch": {
     "description": "Accept high-confidence fuzzy matches for whitespace differences",
@@ -706,6 +706,11 @@
     "description": "Allow the read tool to fetch and process URLs",
     "type": "boolean",
     "value": true
+  },
+  "find.enabled": {
+    "description": "Enable the find tool: natural-language search for files and line ranges, judged by the judge model role",
+    "type": "boolean",
+    "value": false
   },
   "followUpMode": {
     "description": "How to drain follow-up messages after a turn completes",
@@ -859,11 +864,6 @@
     "description": "",
     "type": "number",
     "value": 16000
-  },
-  "hindsight.mentalModelRefreshIntervalMs": {
-    "description": "",
-    "type": "number",
-    "value": 300000
   },
   "hindsight.mentalModelsEnabled": {
     "description": "Read curated reflect summaries (mental models) into developer instructions at boot. Loads existing models on the bank — does not write. Pair with hindsight.mentalModelAutoSeed to also auto-create the built-in seed set.",
@@ -1040,7 +1040,7 @@
     "value": "immediate"
   },
   "irc.timeoutMs": {
-    "description": "Default timeout for hub message waits (and send await:true) in milliseconds; 0 disables the timeout",
+    "description": "Timeout for hub send await:true in milliseconds; 0 disables the timeout",
     "type": "number",
     "value": 120000
   },
@@ -1105,7 +1105,12 @@
     "value": true
   },
   "magicKeywords.enabled": {
-    "description": "Enable hidden notices for standalone ultrathink, orchestrate, and workflowz keywords",
+    "description": "Enable hidden notices for standalone ultrathink, orchestrate, workflowz, jevify keywords",
+    "type": "boolean",
+    "value": true
+  },
+  "magicKeywords.jevify": {
+    "description": "Let standalone jevify append its hidden bulk-judge classification notice",
     "type": "boolean",
     "value": true
   },
@@ -1472,11 +1477,6 @@
     "type": "enum",
     "value": "xhigh"
   },
-  "providers.autoThinkingModel": {
-    "description": "Difficulty classifier for the `auto` thinking level: online (the TINY role from /models, else smol) by default, or a local on-device model",
-    "type": "enum",
-    "value": "online"
-  },
   "providers.cacheRetention": {
     "description": "Prompt-cache retention forwarded to providers that support it (Anthropic, Bedrock, OpenRouter, OpenAI)",
     "type": "enum",
@@ -1492,11 +1492,6 @@
     "type": "enum",
     "value": "standard"
   },
-  "providers.imageOrder": {
-    "description": "Prioritized providers for image generation; unlisted providers follow the active session provider and the built-in order",
-    "type": "array",
-    "value": []
-  },
   "providers.kimiApiFormat": {
     "description": "API format for Kimi Code provider (auto follows live model metadata)",
     "type": "enum",
@@ -1506,11 +1501,6 @@
     "description": "Maximum concurrent LLM requests per provider id (for example \"openai\" or \"anthropic\"), shared across local OMP processes with this config root. Omitted providers are unlimited.",
     "type": "record",
     "value": {}
-  },
-  "providers.memoryModel": {
-    "description": "Mnemopi LLM for fact extraction + consolidation: online (the TINY role from /models, else smol/remote) by default, or a local on-device model",
-    "type": "enum",
-    "value": "online"
   },
   "providers.ollama-cloud.maxConcurrency": {
     "description": "Maximum concurrent Ollama Cloud subagent runs per process; 0 disables the provider-specific limit",
@@ -1547,11 +1537,6 @@
     "type": "number",
     "value": -1
   },
-  "providers.tinyModel": {
-    "description": "Session-title model: online (the TINY role from /models, else @smol) by default, or a local on-device model",
-    "type": "enum",
-    "value": "online"
-  },
   "providers.tinyModelDevice": {
     "description": "Inference backend for local tiny models (titles + memory): an ONNX execution provider, or `mlx` to download MLX weights and run them through mlx-lm on Apple silicon. Default uses CPU-only ONNX. The PI_TINY_DEVICE env var overrides this.",
     "type": "enum",
@@ -1561,30 +1546,6 @@
     "description": "ONNX quantization/precision for local tiny models. Default uses each model's shipped dtype (q4); lower precision is faster, higher is more faithful. Ignored by the MLX backend (its repos are pre-quantized 4-bit). The PI_TINY_DTYPE env var overrides this.",
     "type": "enum",
     "value": "default"
-  },
-  "providers.tts": {
-    "description": "Backend for the tts tool: local on-device neural TTS (Kokoro-82M), xAI Grok Voice, or DeepInfra speech",
-    "type": "enum",
-    "value": "auto"
-  },
-  "providers.unexpectedStopModel": {
-    "description": "Classifier for Smart unexpected-stop detection: online (the TINY role from /models, else smol) by default, or a local on-device model.",
-    "type": "enum",
-    "value": "online"
-  },
-  "providers.webSearchExclude": {
-    "description": "Providers that web_search should never use, even as fallbacks",
-    "type": "array",
-    "value": []
-  },
-  "providers.webSearchGeminiModel": {
-    "description": "Model ID for Gemini Google Search grounding. Defaults to gemini-2.5-flash.",
-    "type": "string"
-  },
-  "providers.webSearchOrder": {
-    "description": "Prioritized providers for the web_search tool; unlisted providers retain their default order afterward",
-    "type": "array",
-    "value": []
   },
   "providers.webSearchTimeoutSeconds": {
     "description": "Hard timeout for each provider's search transport before web_search advances to the next fallback, in seconds (maximum 300)",
@@ -2002,7 +1963,14 @@
   "statusLine.leftSegments": {
     "description": "",
     "type": "array",
-    "value": []
+    "value": [
+      "vim",
+      "model",
+      "mode",
+      "path",
+      "git",
+      "pr"
+    ]
   },
   "statusLine.preset": {
     "description": "Pre-built status line configurations",
@@ -2012,7 +1980,12 @@
   "statusLine.rightSegments": {
     "description": "",
     "type": "array",
-    "value": []
+    "value": [
+      "session_name",
+      "token_total",
+      "cost",
+      "context_pct"
+    ]
   },
   "statusLine.segmentOptions": {
     "description": "",
@@ -2044,6 +2017,16 @@
     "type": "enum",
     "value": "one-at-a-time"
   },
+  "stream.redactPatterns": {
+    "description": "Additional regular expressions redacted from every streamed row, on top of env/secrets.yml values and built-in credential shapes",
+    "type": "array",
+    "value": []
+  },
+  "stream.serverUrl": {
+    "description": "Live stream server used by `omp stream` (https://host[:port]); viewers watch at <base>/<your Stencil username>",
+    "type": "string",
+    "value": "https://live.omp.sh"
+  },
   "stt.enabled": {
     "description": "Enable speech-to-text input via microphone",
     "type": "boolean",
@@ -2053,11 +2036,6 @@
     "description": "",
     "type": "string",
     "value": "en"
-  },
-  "stt.modelName": {
-    "description": "Local on-device speech model. Parakeet TDT v3 (sherpa-onnx) is the SoTA default; Whisper base/small/large-v3-turbo tiers (transformers.js) trade size for multilingual coverage. Downloaded on first use.",
-    "type": "enum",
-    "value": "parakeet"
   },
   "stt.submitTrigger": {
     "description": "Choose when speech dictation automatically submits: Never, Release (2+ words), Release with complete sentence, or When I Say Submit.",
@@ -2389,11 +2367,6 @@
     "type": "enum",
     "value": "default"
   },
-  "tts.localModel": {
-    "description": "On-device neural TTS model (Kokoro-82M) used by the local TTS backend",
-    "type": "enum",
-    "value": "kokoro"
-  },
   "tts.localVoice": {
     "description": "Kokoro voice used by the local TTS backend (American/British, female/male)",
     "type": "enum",
@@ -2494,8 +2467,13 @@
     "type": "boolean",
     "value": false
   },
+  "tui.titleSpinner": {
+    "description": "Glyph set for the working-state spinner in the terminal title — braille sweep, filling moon, single-dot cycle, or ASCII-safe line",
+    "type": "enum",
+    "value": "braille"
+  },
   "tui.titleState": {
-    "description": "Show the agent run state in the terminal title's separator — an animated spinner while working (a static ':' on Windows), '>' when it's your turn, '!' when the agent is waiting on you",
+    "description": "Show the agent run state in the terminal title's separator — an animated spinner while working (a static ':' under WSL), '>' when it's your turn, '!' when the agent is waiting on you",
     "type": "boolean",
     "value": true
   },
