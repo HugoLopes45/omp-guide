@@ -45,6 +45,7 @@ FLAGS
       --no-rules                        Disable rules discovery and loading
       --export=<value>                  Export session file to HTML and exit
       --no-title                        Disable title auto-generation
+      --no-ui                           With --mode rpc: run extensions headless (no extension_ui_request dialogs for the host)
       --print-thoughts                  Include thinking blocks in print mode text output
       --max-time=<value>                Stop the session after this duration (e.g., 600, 10m, 1h)
       --auto-approve                    Auto-approve all tool calls (skip approval prompts)

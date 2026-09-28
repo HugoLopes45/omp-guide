@@ -4,6 +4,11 @@
     "type": "boolean",
     "value": false
   },
+  "advisor.evictStaleResults": {
+    "description": "Before each review, replace the advisor's read/grep/glob output from older reviews with a short placeholder. The latest review is kept.",
+    "type": "boolean",
+    "value": true
+  },
   "advisor.immuneTurns": {
     "description": "After an advisor concern or blocker interrupts, route further concerns/blockers non-interruptingly for this many primary turns.",
     "type": "number",
@@ -53,6 +58,11 @@
     "description": "",
     "type": "number",
     "value": 100
+  },
+  "auth.accountPolicies": {
+    "description": "",
+    "type": "array",
+    "value": []
   },
   "auth.broker.token": {
     "description": "",
@@ -167,19 +177,19 @@
         "tool": "write"
       },
       {
-        "message": "Use the `hub` tool (`op:\"start\"`) instead of nohup or background shell syntax so the process stays observable and managed.",
+        "message": "Use `bash` with `name` instead of nohup or background shell syntax so the service stays observable and managed.",
         "pattern": "^\\s*nohup\\s+|(?<!&)\\&\\s*$",
-        "tool": "hub"
+        "tool": "bash"
       },
       {
-        "message": "Use the `hub` tool (`op:\"start\"`) for services, watchers, and debuggers so other omp instances can observe and control them.",
+        "message": "Use `bash` with `name` for services, watchers, and debuggers; inspect with `read proc://<name>`.",
         "pattern": "^\\s*(?:(?:bun|npm|pnpm|yarn)\\s+(?:run\\s+)?(?:dev|start)(?:\\s|$)|(?:vite|next\\s+dev|nuxt\\s+dev|nodemon|lldb|gdb|tail\\s+-f)(?:\\s|$)|docker\\s+compose\\s+up(?!.*(?:\\s-d(?:\\s|$)|--detach))(?:\\s|$))",
-        "tool": "hub"
+        "tool": "bash"
       },
       {
-        "message": "Use the `hub` tool (`op:\"start\"`) for watch mode so its output, input, and lifecycle stay managed.",
+        "message": "Use `bash` with `name` for watch mode so its output, input, and lifecycle stay managed.",
         "pattern": "^\\s*(?:(?:bun|npm|pnpm|yarn)\\s+(?:run\\s+)?\\S+|cargo\\s+watch|watchexec|pytest|vitest|jest|tsc)(?:.|\\n)*(?:--watch|-w)(?:\\s|$)",
-        "tool": "hub"
+        "tool": "bash"
       }
     ]
   },
@@ -239,6 +249,26 @@
     "description": "Enable the checkpoint and rewind tools for context checkpointing",
     "type": "boolean",
     "value": false
+  },
+  "claudeResets.autoRedeem": {
+    "description": "Spend eligible Claude Cedar or Juniper resets automatically. Cedar is spent only for covered limits; Juniper can only recover a sole 5-hour block. unset asks before the first spend, yes spends without prompting, and no disables blocked recovery and expiry salvage.",
+    "type": "enum",
+    "value": "unset"
+  },
+  "claudeResets.keepCredits": {
+    "description": "Keep at least this many Claude resets banked (0 allows the last eligible reset to be spent automatically). The reserve also applies to expiry salvage.",
+    "type": "number",
+    "value": 0
+  },
+  "claudeResets.minBlockedMinutes": {
+    "description": "Only auto-redeem when the natural unblock — the latest reset among the exhausted covered windows — is at least this many minutes away. A 5-hour-only reset is never used for a weekly or model-scoped block.",
+    "type": "number",
+    "value": 60
+  },
+  "claudeResets.salvageHorizonHours": {
+    "description": "Use a server-selected Cedar reset within this many hours of expiry only when its covered windows have meaningful usage to restore and the grant permits early use or a covered window is exhausted (0 disables salvage).",
+    "type": "number",
+    "value": 12
   },
   "codexResets.autoRedeem": {
     "description": "Spend saved Codex rate-limit resets automatically: restore an account blocked by an exhausted 5h or weekly window when a turn is stuck and no other account can take over, and salvage credits that are about to expire. unset asks before the first spend, yes spends without prompting, and no disables both checks.",
@@ -356,7 +386,7 @@
     "value": true
   },
   "compaction.experimentalContextManagement": {
-    "description": "Keep persistent notes and searchable raw history across context windows. Restart to update available tools.",
+    "description": "Keep persistent notes and searchable raw history across context windows.",
     "type": "boolean",
     "value": false
   },
@@ -397,7 +427,7 @@
     ]
   },
   "compaction.midTurnEnabled": {
-    "description": "Check thresholds at safe mid-turn tool-loop boundaries before the next provider request",
+    "description": "Check thresholds at safe mid-turn tool-loop boundaries before the next provider request; subagents always check, since their whole assignment is one turn",
     "type": "boolean",
     "value": true
   },
@@ -440,7 +470,7 @@
     "value": "on"
   },
   "composer.recallClearedDrafts": {
-    "description": "Keep drafts cleared with Ctrl+C in local Up/Down history until exit; disabling affects future clears",
+    "description": "Keep drafts cleared with Ctrl+C in local ↑/↓ history until exit; disabling affects future clears",
     "type": "boolean",
     "value": true
   },
@@ -568,7 +598,7 @@
     "value": true
   },
   "doubleEscapeAction": {
-    "description": "What pressing Escape twice with an empty editor does: open the transcript rewind selector, open the session tree, or nothing",
+    "description": "What pressing ⎋ twice with an empty editor does: open the transcript rewind selector, open the session tree, or nothing",
     "type": "enum",
     "value": "rewind"
   },
@@ -606,6 +636,11 @@
     "description": "Select the edit tool variant (replace, patch, hashline, or apply_patch)",
     "type": "enum",
     "value": "hashline"
+  },
+  "edit.modelVariants": {
+    "description": "",
+    "type": "record",
+    "value": {}
   },
   "edit.recoverInlineEdits": {
     "description": "Execute edit payloads the model emits as plain text by converting them into edit tool calls",
@@ -646,6 +681,11 @@
     "description": "",
     "type": "number",
     "value": 60000
+  },
+  "eval.autoProvision": {
+    "description": "Automatically create the managed JavaScript eval package environment on first install",
+    "type": "boolean",
+    "value": true
   },
   "eval.js": {
     "description": "Allow the eval tool to dispatch JavaScript cells to the in-process runtime",
@@ -708,9 +748,9 @@
     "value": true
   },
   "find.enabled": {
-    "description": "Enable the find tool: natural-language search for files and line ranges, judged by the judge model role",
-    "type": "boolean",
-    "value": false
+    "description": "Enable the find tool: natural-language search for files and line ranges, judged by the judge model role. Auto enables it only when the judge role resolves to a native TypeSafe jev model",
+    "type": "enum",
+    "value": "auto"
   },
   "followUpMode": {
     "description": "How to drain follow-up messages after a turn completes",
@@ -947,6 +987,31 @@
     "type": "enum",
     "value": "per-project-tagged"
   },
+  "ida.enabled": {
+    "description": "Open executables read with `read` in IDA Pro (idalib) and enable the `ida` tool; inert when no IDA install is found",
+    "type": "boolean",
+    "value": true
+  },
+  "ida.idleCloseSec": {
+    "description": "Save and close IDA databases idle longer than this many seconds (0 = never); the exec namespace resets on reopen",
+    "type": "number",
+    "value": 900
+  },
+  "ida.installDir": {
+    "description": "Directory containing libidalib, exported as IDADIR; empty auto-detects ($IDADIR, ida-config.json, standard install paths)",
+    "type": "string",
+    "value": ""
+  },
+  "ida.maxOpen": {
+    "description": "Most IDA databases (omp.ida.* daemons in omp ps) open at once per project; opening another saves and closes the least recently used idle one",
+    "type": "number",
+    "value": 4
+  },
+  "ida.python": {
+    "description": "Python interpreter that can import ida_domain and idapro; empty auto-detects",
+    "type": "string",
+    "value": ""
+  },
   "images.autoResize": {
     "description": "Resize large images to 2000x2000 max for better model compatibility",
     "type": "boolean",
@@ -1039,18 +1104,13 @@
     "type": "enum",
     "value": "immediate"
   },
-  "irc.timeoutMs": {
-    "description": "Timeout for hub send await:true in milliseconds; 0 disables the timeout",
-    "type": "number",
-    "value": 120000
-  },
   "isolation.backend": {
     "description": "Backend used for subagent isolation and worktree cloning",
     "type": "enum",
     "value": "auto"
   },
   "launch.enabled": {
-    "description": "Enable the launch tool for supervising shared long-running project processes",
+    "description": "Enable named bash services and proc:// supervision for shared long-running project processes",
     "type": "boolean",
     "value": true
   },
@@ -1153,6 +1213,11 @@
     "description": "Render non-JSON MCP text results as Markdown in the transcript",
     "type": "boolean",
     "value": true
+  },
+  "mcp.startupTimeoutMs": {
+    "description": "Wait this many milliseconds for initial MCP tool discovery; 0 waits until connections settle",
+    "type": "number",
+    "value": 250
   },
   "memories.enabled": {
     "description": "",
@@ -1375,7 +1440,7 @@
     "description": "Tool names that may repeat consecutively without triggering the cross-turn loop guard",
     "type": "array",
     "value": [
-      "hub"
+      "wait"
     ]
   },
   "model.toolCallLoopGuard.threshold": {
@@ -1463,9 +1528,14 @@
     "value": "auto"
   },
   "providers.anthropic.serverSideFallback": {
-    "description": "When a Claude Fable 5 / Mythos 5 request is blocked by Anthropic's safety classifier, retry it on Claude Opus 4.8 server-side (Anthropic `server-side-fallback-2026-06-01` beta). Opt-in — leaving this off preserves the pre-fallback behavior for every request.",
+    "description": "When a Claude Fable 5 / Mythos 5 request is blocked by Anthropic's safety classifier, retry it on Claude Opus 5 server-side (Anthropic `server-side-fallback-2026-06-01` beta). Opt-in — leaving this off preserves the pre-fallback behavior for every request.",
     "type": "boolean",
     "value": false
+  },
+  "providers.anthropic.slowMode": {
+    "description": "",
+    "type": "enum",
+    "value": "off"
   },
   "providers.antigravityEndpoint": {
     "description": "Endpoint routing strategy for google-antigravity providers (chat, search, image, discovery)",
@@ -1481,6 +1551,11 @@
     "description": "Prompt-cache retention forwarded to providers that support it (Anthropic, Bedrock, OpenRouter, OpenAI)",
     "type": "enum",
     "value": "auto"
+  },
+  "providers.cacheWarming": {
+    "description": "Re-send the last request with a one-token output budget shortly before its prompt-cache entry expires",
+    "type": "enum",
+    "value": "idle"
   },
   "providers.fetch": {
     "description": "Reader backend priority for the fetch/read URL tool",
@@ -1516,6 +1591,11 @@
     "description": "Extra direct tools for Codex Code Mode. The standard direct tools are eval, ask, todo, yield, think, checkpoint, and rewind.",
     "type": "array",
     "value": []
+  },
+  "providers.openaiLiveSteering": {
+    "description": "Deliver messages typed while a GPT-6 response streams into that response over the Codex WebSocket, instead of waiting for the next tool boundary",
+    "type": "boolean",
+    "value": true
   },
   "providers.openaiWebsockets": {
     "description": "Websocket policy for OpenAI Codex models (auto uses model defaults, on forces, off disables)",
@@ -1683,7 +1763,7 @@
     "value": "confirm"
   },
   "retry.waitForUsageReset": {
-    "description": "When a provider reports usage-limit exhaustion with a reset time (5-hour or weekly quota windows on any provider), sleep until the reset instead of failing fast past retry.maxDelayMs. Waits are abortable (Esc) but also hold subagents, so leave off for unattended runs.",
+    "description": "When a provider reports usage-limit exhaustion with a reset time (5-hour or weekly quota windows on any provider), sleep until the reset instead of failing fast past retry.maxDelayMs. Waits are abortable (⎋) but also hold subagents, so leave off for unattended runs.",
     "type": "boolean",
     "value": false
   },
@@ -1870,6 +1950,11 @@
     "type": "array",
     "value": []
   },
+  "skills.registryUrl": {
+    "description": "Skillshare registry used by `omp skill` to install, search, and publish skills (https://host[:port])",
+    "type": "string",
+    "value": "https://skills.omp.sh"
+  },
   "snapcompact.shape": {
     "description": "Frame shape snapcompact prints text with (compaction archive and inline imaging). Auto picks a shape tuned for the current model.",
     "type": "enum",
@@ -1911,9 +1996,9 @@
     "value": false
   },
   "spelling.autocomplete": {
-    "description": "Show macOS dictionary word completions as inline hints accepted with Tab",
-    "type": "boolean",
-    "value": true
+    "description": "Show predicted word completions as inline hints: ⇥ accepts with a space, → without",
+    "type": "enum",
+    "value": "auto"
   },
   "spelling.autocorrect": {
     "description": "Apply confident macOS spelling corrections after completed words",
@@ -2052,6 +2137,11 @@
     "type": "record",
     "value": {}
   },
+  "task.agentCompactionThresholdOverrides": {
+    "description": "",
+    "type": "record",
+    "value": {}
+  },
   "task.agentIdleTtlMs": {
     "description": "How long an idle subagent stays live in memory before being parked to disk (ms). Parked agents are revived automatically when messaged or resumed. 0 keeps idle agents live until exit.",
     "type": "number",
@@ -2161,6 +2251,11 @@
     "description": "Delay before completed or abandoned todos are removed from the todo widget",
     "type": "number",
     "value": 60
+  },
+  "telemetry.otlpExportEnabled": {
+    "description": "Allow OMP to export traces, logs, and metrics using OTEL_* endpoints. Changes take effect on the next launch.",
+    "type": "boolean",
+    "value": true
   },
   "temperature": {
     "description": "Sampling temperature (0 = deterministic, 1 = creative, -1 = provider default)",
@@ -2308,7 +2403,7 @@
     "value": 500
   },
   "tools.format": {
-    "description": "Controls how tools are exposed to the model. Auto uses provider-native tool calls unless the selected model is marked as not supporting them, then falls back to the GLM owned dialect. Native forces provider-native tools; the other values force the named owned dialect. Applies on session start.",
+    "description": "Controls how tools are exposed to the model. Auto uses provider-native tool calls unless the selected model is marked as not supporting them, then falls back to the GLM owned dialect. Native forces provider-native tools; the other values force the named owned dialect.",
     "type": "enum",
     "value": "auto"
   },
@@ -2345,7 +2440,7 @@
   "tools.xdevDocs": {
     "description": "Choose which mounted-device docs and schemas are inlined in the system prompt. Built-ins keeps core tools inline while MCP and extension tools stay on-demand.",
     "type": "enum",
-    "value": "builtins"
+    "value": "catalog"
   },
   "tools.xdevInlineDevices": {
     "description": "When xd:// Prompt Docs is Built-ins Only, inline dynamic devices whose names match these glob patterns (for example mcp__context_mode_*). Catalog Only ignores this setting.",
@@ -2397,6 +2492,11 @@
     "type": "enum",
     "value": "always"
   },
+  "ttsr.judge": {
+    "description": "Ask the judge model role each `question` rule about completed replies, reasoning, and tool calls; a yes injects the rule as a warning",
+    "type": "enum",
+    "value": "auto"
+  },
   "ttsr.repeatGap": {
     "description": "Messages before a rule can trigger again",
     "type": "number",
@@ -2408,7 +2508,7 @@
     "value": "once"
   },
   "tui.codexResetFireworks": {
-    "description": "Celebrate unscheduled Codex weekly usage resets and newly banked saved resets with a top-third fireworks overlay that remains until Escape",
+    "description": "Celebrate unscheduled Codex weekly usage resets and newly banked saved resets with a top-third fireworks overlay that remains until ⎋",
     "type": "boolean",
     "value": false
   },
@@ -2438,7 +2538,7 @@
     "value": 8
   },
   "tui.mouse": {
-    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target. Native text selection becomes Shift+drag and wheel scroll becomes Shift+wheel while on",
+    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target. Native text selection becomes ⇧+drag and wheel scroll becomes ⇧+wheel while on",
     "type": "boolean",
     "value": false
   },
@@ -2478,7 +2578,7 @@
     "value": true
   },
   "tui.vimMode": {
-    "description": "Modal prompt editing. Escape leaves Insert mode; Normal mode has hjkl, 0, $, ^, w, b, e, gg, G, counts, x/D/C, dd/yy, p and u; operators take motions or text objects (diw, ca(, dap); v/V start a Visual selection that y copies and d deletes",
+    "description": "Modal prompt editing. ⎋ leaves Insert mode; Normal mode has hjkl, 0, $, ^, w, b, e, gg, G, counts, x/D/C, dd/yy, p and u; operators take motions or text objects (diw, ca(, dap); v/V start a Visual selection that y copies and d deletes",
     "type": "boolean",
     "value": false
   },

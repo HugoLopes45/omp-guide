@@ -1,11 +1,12 @@
 COMMANDS
-  acp            Run Oh My Pi as an ACP (Agent Client Protocol) server over stdio
+  acp            Run omp as an ACP (Agent Client Protocol) server over stdio
   agents         Manage bundled task agents
   auth-broker    Manage the omp auth-broker (credential vault)
   auth-gateway   Run an auth-gateway forward proxy backed by the configured broker
-  bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads
+  bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads, or single-user vs parallel load (--detailed)
   browser-relay  Run the local CDP relay that lets the browser prelude drive your own Chrome tabs
   cleanse        Detect and fix project diagnostics with weighted parallel subagents
+  clip           Upload a /record recording to live.omp.sh as a public clip and print its URL
   collab         List active local Collab host metadata without URLs; use collab link <instanceId|pid> to retrieve a control link (--view for view-only)
   commit         Generate a commit message and update changelogs
   completions    Print a shell completion script (bash, zsh, or fish)
@@ -22,8 +23,11 @@ COMMANDS
   images         Inspect, diagnose, probe, and purge image publication backends
   install        Install or link an extension package (alias of `plugin install`/`plugin link`)
   join           Join a shared collab session (same as /join)
+  login          Log in to a model provider (terminal counterpart of /login)
   models         List, search, and refresh available models
+  play           Replay a /record session recording in the terminal (space pauses, q quits)
   plugin         Manage plugins (install, uninstall, list, etc.)
+  predict        Type a prompt and compare every word-completion engine's ghost text live
   ps             List and control daemon-supervised background processes (logs, stop, kill, restart)
   read           Show what the read tool will return for a path, URL, or internal URI
   render         Draw a session's entire thread through the production transcript pipeline (with repaint timing)
@@ -32,11 +36,13 @@ COMMANDS
   setup          Run onboarding setup or install dependencies for optional features
   share          Share a saved session via an encrypted link (same as /share)
   shell          Interactive shell console
+  skill          Install, search, publish, and manage skills on the Skillshare registry (skills.omp.sh)
   ssh            Manage SSH host configurations
   stats          View usage statistics
   stream         Broadcast local omp session screens and chat to your public live channel
-  tiny-models    Download tiny local models (session titles + memory)
+  tiny-models    Download tiny local models (session titles, memory, word completion)
   token          Get the API key or OAuth token for a provider
+  toks           Count a file or text with every embedded offline tokenizer (OpenAI, Claude, Qwen, …)
   ttsr           Inspect and test Time-Traveling Stream Rules (TTSR)
   update         Check for and install updates
   usage          Show provider usage limits for every authenticated account
