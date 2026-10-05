@@ -2,7 +2,7 @@ COMMANDS
   acp            Run omp as an ACP (Agent Client Protocol) server over stdio
   agents         Manage bundled task agents
   auth-broker    Manage the omp auth-broker (credential vault)
-  auth-gateway   Run an auth-gateway forward proxy backed by the configured broker
+  auth-gateway   Run an auth-gateway: an HTTP forward proxy backed by the configured broker, or JSON lines on stdio with your own credentials
   bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads, or single-user vs parallel load (--detailed)
   browser-relay  Run the local CDP relay that lets the browser prelude drive your own Chrome tabs
   cleanse        Detect and fix project diagnostics with weighted parallel subagents

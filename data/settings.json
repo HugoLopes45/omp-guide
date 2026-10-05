@@ -19,10 +19,25 @@
     "type": "number",
     "value": 4
   },
+  "advisor.reviewInterval": {
+    "description": "Default advisor cadence when no WATCHDOG.yml roster is present: review every Nth eligible primary update. 1 = every update. Skipped updates are sent with the next scheduled review.",
+    "type": "number",
+    "value": 1
+  },
+  "advisor.reviewMode": {
+    "description": "Default advisor cadence when no WATCHDOG.yml roster is present. turn reviews every primary turn; agent-end reviews only final yields.",
+    "type": "enum",
+    "value": "turn"
+  },
   "advisor.syncBacklog": {
-    "description": "Pause the main agent for up to 30 seconds if the advisor falls behind by this many turns. Off disables catch-up delays.",
+    "description": "Pause main agent until advisor backlog falls below threshold. Numeric values cap wait at 30 seconds; strict waits for all scheduled reviews without a wall-clock cap. Off disables catch-up delays. Abort, failure, and disposal release waits.",
     "type": "enum",
     "value": "off"
+  },
+  "archive.enabled": {
+    "description": "Enable the read-only archive eval prelude: prompt history, recent projects, past sessions and recaps",
+    "type": "boolean",
+    "value": true
   },
   "ask.enabled": {
     "description": "Enable the ask tool for interactive user questions",
@@ -228,7 +243,7 @@
     "value": true
   },
   "browser.idleCloseSec": {
-    "description": "Close OMP-owned headless browser tabs idle longer than this many seconds (0 = never; session dispose still reaps). Applies only to OMP-launched headless tabs, never relay/CDP/spawned browsers or other sessions' tabs.",
+    "description": "Close OMP-owned headless browser tabs and Tern browser picture-in-pictures idle longer than this many seconds (0 = never; session dispose still reaps). Never touches relay/CDP/spawned browsers or other sessions' tabs.",
     "type": "number",
     "value": 1800
   },
@@ -244,6 +259,11 @@
   "browser.screenshotDir": {
     "description": "Directory to save screenshots. If unset, screenshots go to a temp file. Supports ~. Examples: ~/Downloads, ~/Desktop, /sdcard/Download (Android)",
     "type": "string"
+  },
+  "browser.tern": {
+    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of headless Chromium; falls back to Chromium when no Tern window can host them. Explicit app options, the relay and Browser CDP URL take precedence; headed:false or app.tern:false opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
+    "type": "boolean",
+    "value": true
   },
   "checkpoint.enabled": {
     "description": "Enable the checkpoint and rewind tools for context checkpointing",
@@ -597,6 +617,11 @@
     "type": "boolean",
     "value": true
   },
+  "display.subagentLivePreview": {
+    "description": "Show each pinned subagent's current (or most recent) tool call beneath its row",
+    "type": "boolean",
+    "value": false
+  },
   "doubleEscapeAction": {
     "description": "What pressing ⎋ twice with an empty editor does: open the transcript rewind selector, open the session tree, or nothing",
     "type": "enum",
@@ -782,6 +807,21 @@
     "type": "number",
     "value": 10
   },
+  "gc.stale": {
+    "description": "",
+    "type": "boolean",
+    "value": false
+  },
+  "gc.staleRetainDays": {
+    "description": "",
+    "type": "number",
+    "value": 30
+  },
+  "gc.staleRetainNewest": {
+    "description": "",
+    "type": "number",
+    "value": 20
+  },
   "gc.wal": {
     "description": "",
     "type": "boolean",
@@ -823,7 +863,7 @@
     "value": true
   },
   "goal.continuationModes": {
-    "description": "Run modes where active goals may auto-continue between turns",
+    "description": "Run modes where active goals may auto-continue between turns (\"interactive\", \"rpc\")",
     "type": "array",
     "value": [
       "interactive"
@@ -1099,6 +1139,16 @@
     "type": "enum",
     "value": "auto"
   },
+  "input.bareExitOnEmptySession": {
+    "description": "Submitting exactly `exit`, `quit`, or `q` (any case) before the first message quits instead of prompting the model",
+    "type": "boolean",
+    "value": true
+  },
+  "input.bareSlashCommands": {
+    "description": "Submitting exactly a command name without the leading `/` (e.g. `model`, `compact`) runs that slash command; once the session has messages, press Enter twice to confirm",
+    "type": "boolean",
+    "value": false
+  },
   "interruptMode": {
     "description": "When steering messages interrupt tool execution",
     "type": "enum",
@@ -1350,7 +1400,7 @@
     "value": "en"
   },
   "mnemopi.enhancedRecall": {
-    "description": "Enable the tiered query result cache for repeated and similar recall queries",
+    "description": "Cache recall results for repeated and similar queries with identical options; any memory write clears it",
     "type": "boolean",
     "value": false
   },
@@ -1382,7 +1432,7 @@
     "value": false
   },
   "mnemopi.polyphonicRecall": {
-    "description": "Enable 4-voice recall (vector, graph, fact, temporal) fused with reciprocal rank fusion",
+    "description": "Fuse recall with graph, fact, vector and temporal voices so linked memories surface without a keyword match",
     "type": "boolean",
     "value": false
   },
@@ -1447,6 +1497,11 @@
     "description": "Consecutive identical tool calls required before the corrective steer is injected",
     "type": "number",
     "value": 5
+  },
+  "modelPresets": {
+    "description": "",
+    "type": "record",
+    "value": {}
   },
   "modelProviderOrder": {
     "description": "",
@@ -1641,6 +1696,11 @@
     "description": "Keep the IPython kernel alive across eval calls or start fresh each time",
     "type": "enum",
     "value": "session"
+  },
+  "ratchet.enabled": {
+    "description": "Enable the ratchet eval/hillclimb prelude; /ratchet turns it on for the current session",
+    "type": "boolean",
+    "value": false
   },
   "read.defaultLimit": {
     "description": "Default number of lines returned when agent calls read without a limit",
@@ -2167,6 +2227,11 @@
     "type": "boolean",
     "value": true
   },
+  "task.completionProbe": {
+    "description": "Ask a working subagent, through a cached side request like /btw, to estimate how complete its task is: after 2, 5, 10 and 30 more minutes, then hourly. The estimate shows next to the subagent in wait and task views. Only subagents spawned by the main agent of an interactive session are asked; print, RPC, ACP and SDK runs never probe.",
+    "type": "boolean",
+    "value": true
+  },
   "task.disabledAgents": {
     "description": "",
     "type": "array",
@@ -2247,6 +2312,11 @@
     "type": "boolean",
     "value": true
   },
+  "task.speculativeLaunch": {
+    "description": "Start each batch subagent as soon as its tasks[] item finishes streaming instead of waiting for the whole task call. Launched agents are aborted if the finished call fails validation, is blocked, or its arguments change. Requires auto-allowed task approval and no extension tool lifecycle handlers.",
+    "type": "boolean",
+    "value": true
+  },
   "tasks.todoClearDelay": {
     "description": "Delay before completed or abandoned todos are removed from the todo widget",
     "type": "number",
@@ -2268,7 +2338,7 @@
     "value": true
   },
   "terminal.showProgress": {
-    "description": "Emit OSC 9;4 indeterminate progress while the agent or context maintenance is running",
+    "description": "Emit OSC 9;4 indeterminate progress while the agent or context maintenance is running (always on in Tern)",
     "type": "boolean",
     "value": false
   },
@@ -2386,6 +2456,11 @@
     "description": "Amount of head content kept inline alongside the tail when output spills to artifact (middle elision). 0 disables — keep tail only.",
     "type": "number",
     "value": 20
+  },
+  "tools.artifactMaxBytes": {
+    "description": "Maximum size of the artifact file saved for streaming tool output (bash, python, js eval). Larger output keeps its beginning (up to 3 MB) and its most recent remainder, with a truncation notice between them. 0 = unlimited.",
+    "type": "number",
+    "value": 16
   },
   "tools.artifactSpillThreshold": {
     "description": "Tool output above this size is saved as an artifact; tail is kept inline",

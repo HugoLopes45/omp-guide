@@ -3,6 +3,7 @@ FLAGS
       --smol=<value>                    Smol/fast model for lightweight tasks (or PI_SMOL_MODEL env)
       --slow=<value>                    Slow/reasoning model for thorough analysis (or PI_SLOW_MODEL env)
       --plan=<value>                    Plan model for architectural planning (or PI_PLAN_MODEL env)
+      --goal=<value>                    Start fresh in goal mode (interactive only; bypasses autoResume; no positional prompt, startup plan mode, or explicit resume)
       --prewalk                         Switch from the active model to a fast/cheap model at the first edit/write after the plan's todo list exists (default off; see prewalk.enabled)
       --no-prewalk                      Disable prewalk even if prewalk.enabled is set
       --prewalk-into=<value>            Target model for prewalk (default the "smol" role)
@@ -45,7 +46,7 @@ FLAGS
       --no-rules                        Disable rules discovery and loading
       --export=<value>                  Export session file to HTML and exit
       --no-title                        Disable title auto-generation
-      --no-ui                           With --mode rpc: run extensions headless (no extension_ui_request dialogs for the host)
+      --no-ui                           With --mode rpc or rpc-ui: run extensions headless (rpc-ui tool UI remains enabled)
       --print-thoughts                  Include thinking blocks in print mode text output
       --max-time=<value>                Stop the session after this duration (e.g., 600, 10m, 1h)
       --auto-approve                    Auto-approve all tool calls (skip approval prompts)
