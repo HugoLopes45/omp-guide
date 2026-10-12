@@ -10,7 +10,7 @@
     "value": true
   },
   "advisor.immuneTurns": {
-    "description": "After an advisor concern or blocker interrupts, route further concerns/blockers non-interruptingly for this many primary turns.",
+    "description": "After an advisor concern or blocker interrupts, route further concerns as non-interrupting asides for this many primary turns. Blockers are exempt from the cooldown.",
     "type": "number",
     "value": 3
   },
@@ -50,7 +50,7 @@
     "value": "on"
   },
   "ask.timeout": {
-    "description": "Auto-select the recommended ask option after this many seconds (0 disables)",
+    "description": "Auto-select the recommended ask option after this many seconds (0 disables). Also bounds cfg:// approval prompts; an unanswered approval denies the write instead of auto-selecting",
     "type": "number",
     "value": 0
   },
@@ -141,6 +141,11 @@
     "description": "Enable the bash tool for shell command execution",
     "type": "boolean",
     "value": true
+  },
+  "bash.gitGuard": {
+    "description": "Refuse git commands that discard or move shared work in the bash tool: stash, reset --hard or to another commit, and checkout/switch/restore outside a merge or rebase conflict",
+    "type": "boolean",
+    "value": false
   },
   "bash.patterns": {
     "description": "Ordered bash command approval rules. Each item has match and approval fields; only '*' wildcards are supported.",
@@ -261,7 +266,7 @@
     "type": "string"
   },
   "browser.tern": {
-    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of headless Chromium; falls back to Chromium when no Tern window can host them. Explicit app options, the relay and Browser CDP URL take precedence; headed:false or app.tern:false opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
+    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of headless Chromium; falls back to Chromium when no Tern window can host them. Explicit app options, the relay and Browser CDP URL take precedence; app.tern:false opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
     "type": "boolean",
     "value": true
   },
@@ -271,12 +276,12 @@
     "value": false
   },
   "claudeResets.autoRedeem": {
-    "description": "Spend eligible Claude Cedar or Juniper resets automatically. Cedar is spent only for covered limits; Juniper can only recover a sole 5-hour block. unset asks before the first spend, yes spends without prompting, and no disables blocked recovery and expiry salvage.",
+    "description": "Spend eligible Claude Cedar or Juniper resets automatically. Cedar is spent only for covered limits; Juniper can only recover a sole 5-hour block. unset asks before the first spend (with no prompt UI, it spends only a reset expiring within 5 minutes), yes spends without prompting, and no disables blocked recovery and expiry salvage.",
     "type": "enum",
     "value": "unset"
   },
   "claudeResets.keepCredits": {
-    "description": "Keep at least this many Claude resets banked (0 allows the last eligible reset to be spent automatically). The reserve also applies to expiry salvage.",
+    "description": "Keep at least this many Claude resets banked (0 allows the last eligible reset to be spent automatically). The reserve applies to early salvage, but not to eligible resets expiring within 5 minutes.",
     "type": "number",
     "value": 0
   },
@@ -286,12 +291,12 @@
     "value": 60
   },
   "claudeResets.salvageHorizonHours": {
-    "description": "Use a server-selected Cedar reset within this many hours of expiry only when its covered windows have meaningful usage to restore and the grant permits early use or a covered window is exhausted (0 disables salvage).",
+    "description": "With auto-redeem enabled, use a server-selected Cedar reset within this many hours of expiry when its covered windows have meaningful usage. 0 disables early salvage; eligible Cedar or Juniper resets expiring within 5 minutes are still attempted regardless of usage or reserve. Provider limit requirements still apply.",
     "type": "number",
     "value": 12
   },
   "codexResets.autoRedeem": {
-    "description": "Spend saved Codex rate-limit resets automatically: restore an account blocked by an exhausted 5h or weekly window when a turn is stuck and no other account can take over, and salvage credits that are about to expire. unset asks before the first spend, yes spends without prompting, and no disables both checks.",
+    "description": "Spend saved Codex rate-limit resets automatically: restore an account blocked by an exhausted 5h or weekly window when a turn is stuck and no other account can take over, and salvage credits that are about to expire. unset asks before the first spend (with no prompt UI, it spends only a reset expiring within 5 minutes), yes spends without prompting, and no disables both checks.",
     "type": "enum",
     "value": "unset"
   },
@@ -306,7 +311,7 @@
     "value": 60
   },
   "codexResets.salvageHorizonHours": {
-    "description": "Spend a saved Codex reset automatically when it would otherwise expire within this many hours and either chat window (5h or weekly) has meaningful usage to restore (0 disables expiry salvage).",
+    "description": "With auto-redeem enabled, spend a saved Codex reset within this many hours of expiry when either chat window has meaningful usage. 0 disables early salvage; credits expiring within 5 minutes are still attempted regardless of usage.",
     "type": "number",
     "value": 12
   },
@@ -451,6 +456,16 @@
     "type": "boolean",
     "value": true
   },
+  "compaction.modelThresholds": {
+    "description": "",
+    "type": "record",
+    "value": {}
+  },
+  "compaction.modelThresholdsEnabled": {
+    "description": "",
+    "type": "boolean",
+    "value": true
+  },
   "compaction.remoteEndpoint": {
     "description": "",
     "type": "string"
@@ -489,6 +504,11 @@
     "type": "enum",
     "value": "on"
   },
+  "composer.predictions": {
+    "description": "After a completed turn, ask the active model to predict your next message and show it as ghost text in the empty composer; ⇥ or → inserts it without sending. Extra usage: every completed turn sends one more billed request over the whole conversation (counted in /stats)",
+    "type": "boolean",
+    "value": false
+  },
   "composer.recallClearedDrafts": {
     "description": "Keep drafts cleared with Ctrl+C in local ↑/↓ history until exit; disabling affects future clears",
     "type": "boolean",
@@ -500,14 +520,14 @@
     "value": "band"
   },
   "composer.tokenRate": {
-    "description": "Show a live generation tok/s readout on the working row, docked right next to the session title. Estimated from streamed deltas and corrected by the provider's billed output count as each message completes.",
+    "description": "Show a live generation tok/s readout: on the working row next to the session title, or in the native composer bar right after the thinking level, where the last reading stays between turns. Estimated from streamed deltas and corrected by the provider's billed output count as each message completes.",
     "type": "boolean",
     "value": false
   },
   "computer.display": {
-    "description": "Composite all displays or select a native display id",
+    "description": "Active window's display (active), all displays (all), or a native display id",
     "type": "string",
-    "value": "all"
+    "value": "active"
   },
   "computer.enabled": {
     "description": "Enable the scriptable host-desktop eval prelude (screenshots, input, accessibility)",
@@ -515,14 +535,19 @@
     "value": false
   },
   "computer.maxHeight": {
-    "description": "Maximum composite screenshot height in pixels",
+    "description": "Maximum screenshot height in pixels",
     "type": "number",
     "value": 2400
   },
   "computer.maxWidth": {
-    "description": "Maximum composite screenshot width in pixels",
+    "description": "Maximum screenshot width in pixels",
     "type": "number",
     "value": 3840
+  },
+  "contextFiles.extra": {
+    "description": "Extra instruction filenames loaded beside AGENTS.md. Use a JSON list of names, not paths, e.g. [\"AGENTS.local.md\"]; [] disables extras. Start a new session to load them.",
+    "type": "array",
+    "value": []
   },
   "contextPromotion.enabled": {
     "description": "Promote to a larger-context model on context overflow instead of compacting",
@@ -741,6 +766,11 @@
     "description": "Minimum delay between Exa web search requests in milliseconds; set 0 to disable pacing",
     "type": "number",
     "value": 1000
+  },
+  "expandThinkingBlocks": {
+    "description": "Keep finished thinking blocks expanded instead of collapsing them when the turn ends",
+    "type": "boolean",
+    "value": false
   },
   "extendedContext": {
     "description": "Use larger context windows where supported; may incur premium pricing. Off keeps default or standard-pricing windows",
@@ -1632,6 +1662,11 @@
     "type": "record",
     "value": {}
   },
+  "providers.muse-code.storeResponses": {
+    "description": "Store Muse Code results on Meta's servers so a turn whose connection drops is recovered instead of re-run. Stored runs keep prompts and outputs on Meta's side.",
+    "type": "boolean",
+    "value": false
+  },
   "providers.ollama-cloud.maxConcurrency": {
     "description": "Maximum concurrent Ollama Cloud subagent runs per process; 0 disables the provider-specific limit",
     "type": "number",
@@ -1786,6 +1821,11 @@
     "description": "JSON object mapping model roles, model selectors (\"provider/model-id\"), or provider wildcards (\"provider/*\") to ordered fallback selectors, e.g. {\"default\":[\"openai/gpt-4o-mini\"],\"google-antigravity/*\":[\"google/*\",\"google-vertex/*\"]}. Model-oriented keys apply whenever that model/provider is active, regardless of role; a \"provider/*\" entry keeps the failing model's id and swaps the provider. An id-prefixed wildcard (\"openrouter/google/*\") re-prefixes the failing model's bare id (google-antigravity/gemini-x -> openrouter/google/gemini-x) and, used as a key, matches only that provider's ids under the prefix. A fallback entry may carry an explicit thinking suffix (\"provider/model:low\", \":high\", \":max\", \":off\"); a bare entry inherits the failing turn's effort, and \"provider/*\" entries always inherit.",
     "type": "record",
     "value": {}
+  },
+  "retry.fallbackOn": {
+    "description": "Which failed requests may switch to a configured fallback model",
+    "type": "enum",
+    "value": "any"
   },
   "retry.fallbackRevertPolicy": {
     "description": "When to return to the primary model after a fallback",
@@ -2045,6 +2085,11 @@
     "type": "enum",
     "value": "assistant"
   },
+  "speech.speed": {
+    "description": "Speaking rate when reading the assistant's output aloud. 1 = normal; clamped to 0.5–2.5",
+    "type": "number",
+    "value": 1
+  },
   "speech.voice": {
     "description": "Kokoro voice used when speaking the assistant's output aloud",
     "type": "enum",
@@ -2096,7 +2141,7 @@
     "value": false
   },
   "statusLine.compactThinkingLevel": {
-    "description": "Show the thinking level as a single icon on the model name instead of a separate ` · <level>` suffix.",
+    "description": "Show the thinking level as a single icon on the model name instead of a separate ` · <level>` suffix; in Tern's composer, as the model chip's icon instead of a separate chip (click the icon to cycle it).",
     "type": "boolean",
     "value": true
   },
@@ -2191,6 +2236,11 @@
     "description": "Glyph set for icons and symbols (Unicode, Nerd Font, or ASCII)",
     "type": "enum",
     "value": "unicode"
+  },
+  "task.agentAccountPools": {
+    "description": "",
+    "type": "record",
+    "value": {}
   },
   "task.agentAdvisor": {
     "description": "",
@@ -2303,7 +2353,7 @@
     "value": false
   },
   "task.softRequestBudget": {
-    "description": "Soft per-subagent request budget (assistant requests per run). Crossing it injects a wrap-up steering notice (see task.softRequestBudgetNotice); at 1.5x the budget the run is force-stopped and the agent must yield its partial findings. 0 disables the guard. Bundled scout/sonic agents cap out at a lower built-in budget, so a value below that cap still applies to them.",
+    "description": "Soft per-subagent request budget (assistant requests per run). Crossing it injects a wrap-up steering notice (see task.softRequestBudgetNotice); at 1.5x the budget the run is force-stopped and the agent must hand back its partial findings. 0 disables the guard. Bundled scout/sonic agents cap out at a lower built-in budget, so a value below that cap still applies to them.",
     "type": "number",
     "value": 200
   },
@@ -2316,6 +2366,11 @@
     "description": "Start each batch subagent as soon as its tasks[] item finishes streaming instead of waiting for the whole task call. Launched agents are aborted if the finished call fails validation, is blocked, or its arguments change. Requires auto-allowed task approval and no extension tool lifecycle handlers.",
     "type": "boolean",
     "value": true
+  },
+  "task.structured": {
+    "description": "Expose outputSchema/schemaMode on the task tool and return subagent results through the yield tool, validated against caller or agent output schemas. Off: task subagents have no yield tool and return their final message as plain text. Eval agent()/workpool spawns always keep structured results.",
+    "type": "boolean",
+    "value": false
   },
   "tasks.todoClearDelay": {
     "description": "Delay before completed or abandoned todos are removed from the todo widget",
@@ -2331,6 +2386,11 @@
     "description": "Sampling temperature (0 = deterministic, 1 = creative, -1 = provider default)",
     "type": "number",
     "value": -1
+  },
+  "terminal.programStatus": {
+    "description": "Report whether the agent is working, waiting on you, done, or failed over OSC 7501, for terminal tab indicators and agent inboxes",
+    "type": "boolean",
+    "value": true
   },
   "terminal.showImages": {
     "description": "Render images inline in the terminal",
@@ -2411,6 +2471,16 @@
     "description": "Service Tier for spawned task/eval subagents. Inherit = match the main agent's live per-family tiers (tracks /fast); pick a value to apply it to whichever family the subagent's model belongs to.",
     "type": "enum",
     "value": "inherit"
+  },
+  "title.generator": {
+    "description": "What names an untitled session from the user's messages",
+    "type": "enum",
+    "value": "fork"
+  },
+  "title.icons": {
+    "description": "Icon and short code that head new generated or /rename session titles",
+    "type": "enum",
+    "value": "nf+emoji"
   },
   "title.refreshOnReplan": {
     "description": "Refresh generated session titles after todo init replans unless the title was set by the user",
@@ -2508,7 +2578,7 @@
     "value": 2
   },
   "tools.xdev": {
-    "description": "Mount rarely-used (discoverable) tools under xd:// device URLs driven via read/write instead of shipping their schemas on every request. Sessions whose explicit tool list grants read but omits write mount devices through a device-only write transport (filesystem writes stay rejected). Disable to expose every enabled tool top-level.",
+    "description": "Mount rarely-used (discoverable) tools under xd:// device URLs driven via read/write instead of shipping their schemas on every request. Sessions whose explicit tool list grants read but omits write mount devices through a device-only write transport (only local:// scratch stays writable besides devices). Disable to expose every enabled tool top-level.",
     "type": "boolean",
     "value": true
   },
@@ -2536,6 +2606,11 @@
     "description": "Default filter mode when opening the session tree",
     "type": "enum",
     "value": "default"
+  },
+  "tts.localSpeed": {
+    "description": "Speaking rate of the local TTS backend (tts tool, omp say). 1 = normal; clamped to 0.5–2.5",
+    "type": "number",
+    "value": 1
   },
   "tts.localVoice": {
     "description": "Kokoro voice used by the local TTS backend (American/British, female/male)",
@@ -2582,6 +2657,11 @@
     "type": "enum",
     "value": "once"
   },
+  "tui.autoGraph": {
+    "description": "Draw a chart under numeric tables in the agent's answers, in your theme's colors, on terminals that show graphics",
+    "type": "enum",
+    "value": "always"
+  },
   "tui.codexResetFireworks": {
     "description": "Celebrate unscheduled Codex weekly usage resets and newly banked saved resets with a top-third fireworks overlay that remains until ⎋",
     "type": "boolean",
@@ -2624,6 +2704,11 @@
   },
   "tui.renderMermaid": {
     "description": "Render Mermaid fenced code blocks as ASCII diagrams",
+    "type": "boolean",
+    "value": true
+  },
+  "tui.renderSvg": {
+    "description": "Invite the agent to draw diagrams and charts as SVG, rendered inline as images on terminals that show graphics",
     "type": "boolean",
     "value": true
   },
@@ -2695,5 +2780,15 @@
     "description": "New worktrees from `github pr_checkout` and `git worktree add` in bash start as a copy-on-write clone of the current checkout so ignored build artifacts (node_modules, target) carry over; falls back to a plain checkout when the filesystem cannot clone",
     "type": "boolean",
     "value": true
+  },
+  "worktree.onExit": {
+    "description": "What to do on exit with worktrees created since omp started (on start or with `/wt`)",
+    "type": "enum",
+    "value": "keep"
+  },
+  "worktree.onStart": {
+    "description": "Whether fresh interactive sessions start in a new linked worktree",
+    "type": "enum",
+    "value": "off"
   }
 }

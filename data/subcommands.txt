@@ -1,6 +1,8 @@
 COMMANDS
   acp            Run omp as an ACP (Agent Client Protocol) server over stdio
   agents         Manage bundled task agents
+  anonymize      Write a shareable copy of a session and its subagents: turn contents redacted, metadata kept, paths and literals replaced by consistent mock tokens
+  auth           Export or import stored provider credentials (API keys and OAuth logins) as JSON
   auth-broker    Manage the omp auth-broker (credential vault)
   auth-gateway   Run an auth-gateway: an HTTP forward proxy backed by the configured broker, or JSON lines on stdio with your own credentials
   bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads, or single-user vs parallel load (--detailed)
@@ -33,6 +35,7 @@ COMMANDS
   render         Draw a session's entire thread through the production transcript pipeline (with repaint timing)
   say            Synthesize text with the local TTS engine and play it through the speakers
   search         Test web search providers
+  session        Hand a session to another machine: pack it, unpack it, or mark the local copy moved
   setup          Run onboarding setup or install dependencies for optional features
   share          Share a saved session via an encrypted link (same as /share)
   shell          Interactive shell console
