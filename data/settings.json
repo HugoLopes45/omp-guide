@@ -1,4 +1,9 @@
 {
+  "advisor.continueSeverity": {
+    "description": "Minimum severity of an advisor note that wakes the agent after it finished with a final answer. Lower-severity notes stay as a card at the end of the transcript and reach the agent with your next message.",
+    "type": "enum",
+    "value": "concern"
+  },
   "advisor.enabled": {
     "description": "Pair a second model (assigned to the 'advisor' role) that passively reviews each turn and injects notes.",
     "type": "boolean",
@@ -431,7 +436,7 @@
     "value": 200000
   },
   "compaction.idleTimeoutSeconds": {
-    "description": "Seconds to wait while idle before compacting",
+    "description": "Seconds to wait while idle before compacting; with a 1-hour prompt cache, compaction instead runs just before the cache expires",
     "type": "number",
     "value": 300
   },
@@ -524,6 +529,11 @@
     "type": "boolean",
     "value": false
   },
+  "computer.backgroundFallback": {
+    "description": "What window input does when its background route is unavailable: rerun it in takeover and return focus to your app (macOS; elsewhere plain takeover), or refuse, which also keeps the agent from taking the foreground or opening macOS menus itself",
+    "type": "enum",
+    "value": "takeover"
+  },
   "computer.display": {
     "description": "Active window's display (active), all displays (all), or a native display id",
     "type": "string",
@@ -550,7 +560,7 @@
     "value": []
   },
   "contextPromotion.enabled": {
-    "description": "Promote to a larger-context model on context overflow instead of compacting",
+    "description": "Promote to the model's contextPromotionTarget on context overflow instead of compacting. Retry fallback switches are controlled by Retry Model Fallback",
     "type": "boolean",
     "value": false
   },
@@ -826,6 +836,16 @@
     "description": "",
     "type": "number",
     "value": 30
+  },
+  "gc.compress": {
+    "description": "",
+    "type": "boolean",
+    "value": false
+  },
+  "gc.compressAfterDays": {
+    "description": "",
+    "type": "number",
+    "value": 7
   },
   "gc.retainNewestGlobal": {
     "description": "",
@@ -1239,8 +1259,13 @@
     "type": "boolean",
     "value": true
   },
+  "lsp.requestTimeout": {
+    "description": "Seconds to wait for a language server's diagnostics, hover and other answers when the agent sets no timeout; late post-edit diagnostics wait at least this long. Raise it for servers that are slow on a cold start. The lsp tool's timeout argument can still raise or lower it per call",
+    "type": "number",
+    "value": 10
+  },
   "lsp.shared": {
-    "description": "Share one language server per project across omp instances via the daemon broker (falls back to private servers when unavailable)",
+    "description": "Start language servers through the per-project daemon broker. Each connection gets its own server. While another omp instance in the project is running, a released server stays warm and the next connection reuses it instead of cold-starting (falls back to private servers when unavailable)",
     "type": "boolean",
     "value": true
   },
@@ -1597,6 +1622,16 @@
     "type": "number",
     "value": -1
   },
+  "prewalk.auto": {
+    "description": "Ask the native judge resolved through the 'judge' role whether each new top-level user task front-loads its hard reasoning. Needs a native judge; without one nothing is classified. Independent of Enable Prewalk.",
+    "type": "enum",
+    "value": "off"
+  },
+  "prewalk.autoTarget": {
+    "description": "Model or role (default '@smol') auto-prewalk hands off to at the first edit/write.",
+    "type": "string",
+    "value": "@smol"
+  },
   "prewalk.enabled": {
     "description": "Start on the active model, then switch to a fast/cheap model (default the 'smol' role) at the first edit/write after the plan nudge's todo list exists — the strong model plans, commits the todos, and starts the implementation before handing off. Overridable per session with --prewalk / --no-prewalk.",
     "type": "boolean",
@@ -1671,16 +1706,6 @@
     "description": "Maximum concurrent Ollama Cloud subagent runs per process; 0 disables the provider-specific limit",
     "type": "number",
     "value": 3
-  },
-  "providers.openai-codex.codeMode": {
-    "description": "Route Codex code_mode_only models (GPT-5.6) through eval. The direct tools are eval, ask, todo, yield, think, checkpoint, and rewind. Use eval cells for other session tools. Mirrors codex-rs Code Mode. 'auto' follows the model catalog flag.",
-    "type": "enum",
-    "value": "off"
-  },
-  "providers.openai-codex.codeModeDirectTools": {
-    "description": "Extra direct tools for Codex Code Mode. The standard direct tools are eval, ask, todo, yield, think, checkpoint, and rewind.",
-    "type": "array",
-    "value": []
   },
   "providers.openaiLiveSteering": {
     "description": "Deliver messages typed while a GPT-6 response streams into that response over the Codex WebSocket, instead of waiting for the next tool boundary",
@@ -1843,7 +1868,7 @@
     "value": 10
   },
   "retry.modelFallback": {
-    "description": "Allow retry recovery to switch to configured fallback models",
+    "description": "Allow retry recovery to switch to models in retry.fallbackChains after provider errors. Independent of Auto-Promote Context",
     "type": "boolean",
     "value": true
   },
@@ -1938,6 +1963,11 @@
     "description": "",
     "type": "number",
     "value": 5
+  },
+  "sharpshooter.minPromptLength": {
+    "description": "",
+    "type": "number",
+    "value": 16
   },
   "sharpshooter.model": {
     "description": "Model selector for extraction/consolidation, empty = smol role",
@@ -2066,7 +2096,7 @@
     "value": "none"
   },
   "snapcompact.toolResults": {
-    "description": "Experimental: render large historical tool results as dense PNG image(s) instead of text (vision models only). Saves tokens on accumulated read/search output.",
+    "description": "Experimental: render large tool results, the newest one included, as dense PNG image(s) instead of text (vision models only). Saves tokens on accumulated search and command output; read results stay text unless the model is known to edit exactly from images.",
     "type": "boolean",
     "value": false
   },
@@ -2272,6 +2302,11 @@
     "type": "record",
     "value": {}
   },
+  "task.agentSoftRequestBudget": {
+    "description": "",
+    "type": "record",
+    "value": {}
+  },
   "task.batch": {
     "description": "Switch the task tool to its batch shape: one call carries { context, tasks[] } — one subagent per item, with an optional per-item agent (defaulting to the session spawn-policy agent), per-item isolation, and a required shared context prepended to every assignment. With async.enabled=true, each spawn runs as an independent background agent with the normal idle/parked lifecycle; otherwise the call blocks for merged results. Disable to restore the flat single-spawn schema.",
     "type": "boolean",
@@ -2313,7 +2348,7 @@
     "value": "generic"
   },
   "task.isolation.enabled": {
-    "description": "Run subagents in an isolated copy of the checkout and integrate their changes afterwards",
+    "description": "Allow per-task isolation with `isolated: true`; tasks without it run in the shared checkout",
     "type": "boolean",
     "value": false
   },
@@ -2353,7 +2388,7 @@
     "value": false
   },
   "task.softRequestBudget": {
-    "description": "Soft per-subagent request budget (assistant requests per run). Crossing it injects a wrap-up steering notice (see task.softRequestBudgetNotice); at 1.5x the budget the run is force-stopped and the agent must hand back its partial findings. 0 disables the guard. Bundled scout/sonic agents cap out at a lower built-in budget, so a value below that cap still applies to them.",
+    "description": "Soft per-subagent request budget (assistant requests per run). Crossing it injects a wrap-up steering notice (see task.softRequestBudgetNotice); at 1.5x the budget the run is force-stopped and the agent must hand back its partial findings. 0 disables the guard. Bundled scout/sonic agents cap out at a lower built-in budget, so a value below that cap still applies to them. A task.agentSoftRequestBudget entry replaces this budget for the agent it names.",
     "type": "number",
     "value": 200
   },
@@ -2368,7 +2403,7 @@
     "value": true
   },
   "task.structured": {
-    "description": "Expose outputSchema/schemaMode on the task tool and return subagent results through the yield tool, validated against caller or agent output schemas. Off: task subagents have no yield tool and return their final message as plain text. Eval agent()/workpool spawns always keep structured results.",
+    "description": "Expose outputSchema/schemaMode on the task tool and return subagent results through the yield tool, validated against caller or agent output schemas. Off: task subagents have no yield tool and return their final message as plain text, except agents whose definition sets structured: true. Eval agent()/workpool spawns always keep structured results.",
     "type": "boolean",
     "value": false
   },
@@ -2664,6 +2699,11 @@
   },
   "tui.codexResetFireworks": {
     "description": "Celebrate unscheduled Codex weekly usage resets and newly banked saved resets with a top-third fireworks overlay that remains until ⎋",
+    "type": "boolean",
+    "value": false
+  },
+  "tui.completeScrollback": {
+    "description": "Send transcript rows pushed off screen by a growing HUD or dialog straight to scrollback; when it shrinks, blank rows sit between the transcript and the input until new output fills them",
     "type": "boolean",
     "value": false
   },

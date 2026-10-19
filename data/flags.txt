@@ -5,7 +5,7 @@ FLAGS
       --plan=<value>                    Plan model for architectural planning (or PI_PLAN_MODEL env)
       --goal=<value>                    Start fresh in goal mode (interactive only; bypasses autoResume; no positional prompt, startup plan mode, or explicit resume)
       --prewalk                         Switch from the active model to a fast/cheap model at the first edit/write after the plan's todo list exists (default off; see prewalk.enabled)
-      --no-prewalk                      Disable prewalk even if prewalk.enabled is set
+      --no-prewalk                      Disable prewalk, including prewalk.auto, even if prewalk.enabled is set
       --prewalk-into=<value>            Target model for prewalk (default the "smol" role)
       --plan-yolo                       Force read-only plan mode at start, auto-approve the plan on the model's first resolve call, then switch to --plan-yolo-into to implement it
       --plan-yolo-into=<value>          Target model for plan-yolo execution (default the "smol" role)
@@ -24,6 +24,7 @@ FLAGS
   -p, --print                           Non-interactive mode: process prompt and exit
   -c, --continue                        Continue previous session
   -r, --resume=<value>                  Resume a session (by ID prefix, path, or picker if omitted)
+      --restore=<value>                 Resume a session as --resume does, then go on with what its last process left unfinished (the interrupted turn and the subagents it was running)
       --from-claude                     Import a Claude Code session into OMP
       --from-codex                      Import a Codex session into OMP
       --session-dir=<value>             Directory for session storage and lookup
