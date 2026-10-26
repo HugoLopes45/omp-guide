@@ -79,6 +79,11 @@
     "type": "number",
     "value": 100
   },
+  "async.widgets": {
+    "description": "Draw a live widget for each running background job (charts, bars, status grids derived from its output) in the wait card, the jobs pill and the jobs sheet. The `widget` model role (default: `smol`) writes one spec per job; updates need no further model calls",
+    "type": "boolean",
+    "value": true
+  },
   "auth.accountPolicies": {
     "description": "",
     "type": "array",
@@ -1973,6 +1978,10 @@
     "description": "Model selector for extraction/consolidation, empty = smol role",
     "type": "string"
   },
+  "shellCommandPrefix": {
+    "description": "",
+    "type": "string"
+  },
   "shellMinimizer.enabled": {
     "description": "Compress verbose shell output (git, npm, cargo, etc.) before returning it to the agent",
     "type": "boolean",
@@ -2553,7 +2562,7 @@
     "value": {}
   },
   "tools.approvalMode": {
-    "description": "Default approval behavior for tool calls. 'Always ask' auto-approves read-only tools only. 'Write' auto-approves read and workspace-write tools. 'Yolo' auto-approves all tiers; user policy may still prompt or block.",
+    "description": "Default approval behavior for tool calls. 'Always ask' auto-approves read-only tools only. 'Ask and remember' also asks before file reads, and can remember a file or folder. 'Write' auto-approves read and workspace-write tools. 'Yolo' auto-approves all tiers; user policy may still prompt or block.",
     "type": "enum",
     "value": "yolo"
   },

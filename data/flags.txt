@@ -51,6 +51,6 @@ FLAGS
       --print-thoughts                  Include thinking blocks in print mode text output
       --max-time=<value>                Stop the session after this duration (e.g., 600, 10m, 1h)
       --auto-approve                    Auto-approve all tool calls (skip approval prompts)
-      --approval-mode=<value>           Override tools.approvalMode for this session (always-ask|write|yolo)
+      --approval-mode=<value>           Override tools.approvalMode for this session (always-ask|always-ask-cached|write|yolo)
 
 EXAMPLES
