@@ -79,8 +79,13 @@
     "type": "number",
     "value": 100
   },
+  "async.printWake": {
+    "description": "In print mode (-p, --mode json), keep running after the last prompt while this run's background jobs are active, and start another turn in the same session with each job's result; exits once no job or result is pending. Off: print mode exits after its prompts and cancels running jobs",
+    "type": "boolean",
+    "value": false
+  },
   "async.widgets": {
-    "description": "Draw a live widget for each running background job (charts, bars, status grids derived from its output) in the wait card, the jobs pill and the jobs sheet. The `widget` model role (default: `smol`) writes one spec per job; updates need no further model calls",
+    "description": "Draw a live widget for each running background job (charts, bars, status grids derived from its output) in the wait card, the jobs pill and the jobs sheet, and caption long shell commands with one line on what they do. The `widget` model role (default: `smol`) writes one spec and at most one caption per job; updates need no further model calls",
     "type": "boolean",
     "value": true
   },
@@ -98,7 +103,7 @@
     "type": "string"
   },
   "autoResume": {
-    "description": "Automatically resume the most recent session in the current directory",
+    "description": "Automatically resume the most recent session in the current directory. If its model cannot be restored and model fallback is disabled, interactive startup warns and starts a new session without the saved history",
     "type": "boolean",
     "value": false
   },
@@ -153,7 +158,7 @@
     "value": true
   },
   "bash.gitGuard": {
-    "description": "Refuse git commands that discard or move shared work in the bash tool: stash, reset --hard or to another commit, and checkout/switch/restore outside a merge or rebase conflict",
+    "description": "Refuse git commands that discard or move shared work in a repository's main checkout: stash, reset --hard or to another commit, and checkout/switch/restore outside a merge or rebase conflict. In a linked worktree they run, saving uncommitted changes they discard first",
     "type": "boolean",
     "value": false
   },
@@ -173,7 +178,7 @@
     "value": [
       {
         "message": "Use the `read` tool instead of cat/head/tail. It provides better context and handles binary files.",
-        "pattern": "^\\s*(cat|head|tail|less|more)\\s+",
+        "pattern": "^\\s*(?:(?:head|tail|less|more)\\s+|cat\\s+(?!\\s|(?:[02-9]>{1,2}\\|?\\s*[^\\s>|]\\S*\\s+)*(?:<<|1?>(?!&)|&>)))",
         "tool": "read"
       },
       {
@@ -202,8 +207,8 @@
         "tool": "edit"
       },
       {
-        "message": "Use the `write` tool instead of echo/cat redirection. It handles encoding and provides confirmation.",
-        "pattern": "^\\s*(echo|printf|cat\\s*<<)\\s+(?:(?:[^\"'>]|\"[^\"]*\"|'[^']*')|(?<!\\|)>{1,2}\\|?\\s*(?:\"/dev/(?:null|tty|stdout|stderr)\"|'/dev/(?:null|tty|stdout|stderr)'|/dev/(?:null|tty|stdout|stderr))(?:[\\s;&|]|$))*(?<!\\|)>{1,2}\\|?\\s*(?!(?:\"/dev/(?:null|tty|stdout|stderr)\"|'/dev/(?:null|tty|stdout|stderr)'|/dev/(?:null|tty|stdout|stderr))(?:[\\s;&|]|$))[$\\w./~\"'-]",
+        "message": "Use the `write` tool instead of echo/cat redirection. It handles encoding and provides confirmation. `write` replaces the whole file; to append to an existing file, use `edit` to insert after its last line.",
+        "pattern": "^\\s*(?:(?:echo|printf)\\s+|cat\\s*<<|cat(?=\\s+(?:\\d+|&)?>)\\s+)(?:(?:\\\\[\\s\\S]|\\$\\((?:[^()\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|\\([^()]*\\))*\\)|\\$\\{[^{}]*\\}|`[^`]*`|\\$(?!\\((?:[^()\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|\\([^()]*\\))*\\)|\\{[^{}]*\\})|`(?![^`]*`)|[^\"'>;&|\\n\\\\$`]|(?<=[<>])&|(?<![<>])&(?=>)|(?<=(?:^|\\s)[02-9])>{1,2}\\|?|\"[^\"]*\"|'[^']*')|(?<!\\||>|(?:^|\\s)[02-9])>{1,2}\\|?\\s*(?:\"/dev/(?:null|tty|stdout|stderr)\"|'/dev/(?:null|tty|stdout|stderr)'|/dev/(?:null|tty|stdout|stderr))(?=[\\s;&|]|$))*(?<!\\||>|(?:^|\\s)[02-9])>{1,2}\\|?\\s*(?!(?:\"/dev/(?:null|tty|stdout|stderr)\"|'/dev/(?:null|tty|stdout|stderr)'|/dev/(?:null|tty|stdout|stderr))(?:[\\s;&|]|$))[$\\w./~\"'-]",
         "tool": "write"
       },
       {
@@ -617,6 +622,11 @@
     "type": "array",
     "value": []
   },
+  "display.advisorCollapsedLines": {
+    "description": "Maximum note lines a collapsed advisor card shows below its header (0 keeps the full preview; expand with the tool-output toggle)",
+    "type": "number",
+    "value": 0
+  },
   "display.cacheMissMarker": {
     "description": "Show a divider after an assistant turn whose request lost (missed) the prompt cache",
     "type": "boolean",
@@ -792,10 +802,20 @@
     "type": "boolean",
     "value": false
   },
+  "extensionHandlers.modeControl": {
+    "description": "Let extensions enter and exit plan, vibe, goal, and loop modes via ctx.sessionModes.set(); reading mode state stays available",
+    "type": "boolean",
+    "value": true
+  },
   "extensionHandlers.toolCallTimeoutMs": {
     "description": "Positive finite active-work timeout for extension tool_call handlers; invalid values use 30000ms, and time awaiting OMP-owned dialogs does not count",
     "type": "number",
     "value": 30000
+  },
+  "extensionRenderers.assistantText": {
+    "description": "Let extensions change how assistant replies are drawn, redraw a reply in place, and receive clicks on their own links; the session, exports and model context keep the reply as written",
+    "type": "boolean",
+    "value": false
   },
   "extensions": {
     "description": "",
@@ -831,6 +851,11 @@
     "description": "",
     "type": "boolean",
     "value": true
+  },
+  "gc.autoCompress": {
+    "description": "",
+    "type": "boolean",
+    "value": false
   },
   "gc.blobs": {
     "description": "",
@@ -1214,6 +1239,11 @@
     "type": "enum",
     "value": "auto"
   },
+  "judgment.attemptTimeoutMs": {
+    "description": "",
+    "type": "number",
+    "value": 3000
+  },
   "launch.enabled": {
     "description": "Enable named bash services and proc:// supervision for shared long-running project processes",
     "type": "boolean",
@@ -1588,6 +1618,11 @@
     "type": "boolean",
     "value": false
   },
+  "out.enabled": {
+    "description": "Let the agent reply mid-task by writing to out://, shown like a response without ending its turn. Unset: on in the interactive TUI, off in print, RPC, and ACP",
+    "type": "boolean",
+    "value": true
+  },
   "paste.largeMenuThreshold": {
     "description": "When a paste reaches this many lines, offer a menu to wrap it in a code block, wrap it in XML tags, or save it to a file. 0 disables the menu (large pastes still collapse to a [Paste] marker).",
     "type": "number",
@@ -1618,7 +1653,7 @@
     "value": true
   },
   "power.sleepPrevention": {
-    "description": "Prevent the system sleeping during active sessions. Each level is cumulative — it adds the flags of all lower levels.",
+    "description": "Prevent the system sleeping while the agent is running a turn; an idle session, including one waiting on background jobs, does not hold it. Each level is cumulative — it adds the flags of all lower levels.",
     "type": "enum",
     "value": "idle"
   },
@@ -1641,6 +1676,16 @@
     "description": "Start on the active model, then switch to a fast/cheap model (default the 'smol' role) at the first edit/write after the plan nudge's todo list exists — the strong model plans, commits the todos, and starts the implementation before handing off. Overridable per session with --prewalk / --no-prewalk.",
     "type": "boolean",
     "value": false
+  },
+  "prewalk.from": {
+    "description": "Model or role (default '@default') that /prewalk restart returns to for planning.",
+    "type": "string",
+    "value": "@default"
+  },
+  "prewalk.into": {
+    "description": "Model or role (default '@smol') that prewalk hands off to at the first edit/write: /prewalk, /prewalk restart, Enable Prewalk, and --prewalk. Auto-prewalk uses its own target.",
+    "type": "string",
+    "value": "@smol"
   },
   "proseOnlyThinking": {
     "description": "Omit code blocks from thinking summaries and replace them with an ellipsis",
@@ -1712,10 +1757,15 @@
     "type": "number",
     "value": 3
   },
+  "providers.openai-codex.daybreak": {
+    "description": "Automatically request the Daybreak Blue cyber access program on ChatGPT accounts eligible for it. OpenAI may use content from Daybreak Blue sessions to improve its models. Does not cover dedicated Daybreak Blue models (gpt-daybreak-blue-*), which may still run as Daybreak sessions.",
+    "type": "boolean",
+    "value": true
+  },
   "providers.openaiLiveSteering": {
     "description": "Deliver messages typed while a GPT-6 response streams into that response over the Codex WebSocket, instead of waiting for the next tool boundary",
     "type": "boolean",
-    "value": true
+    "value": false
   },
   "providers.openaiWebsockets": {
     "description": "Websocket policy for OpenAI Codex models (auto uses model defaults, on forces, off disables)",
@@ -1877,6 +1927,11 @@
     "type": "boolean",
     "value": true
   },
+  "retry.rateLimitWalksChain": {
+    "description": "On a rate limit, do not hold the retry.fallbackChains walk for a turn whose thinking is signed by the failing model. Off (the default), such a turn keeps retrying the rate-limited model until retry.maxRetries is spent before the chain is reached.",
+    "type": "boolean",
+    "value": false
+  },
   "retry.usageAwareFallback": {
     "description": "Use reliable coding-plan quota reports to prefer same-provider accounts, then configured fallback models, before a hard usage limit. Ordinary configured API keys are excluded.",
     "type": "boolean",
@@ -1938,6 +1993,19 @@
     "description": "Enable OMP-native security scan planning, execution, and the read-only security:// resource namespace",
     "type": "boolean",
     "value": false
+  },
+  "session.maxCost": {
+    "description": "",
+    "type": "number"
+  },
+  "session.warnCost": {
+    "description": "",
+    "type": "number"
+  },
+  "session.worktreeScope": {
+    "description": "Choose whether the resume picker's current folder includes sessions from other repository worktrees",
+    "type": "enum",
+    "value": "repo"
   },
   "setupVersion": {
     "description": "",
@@ -2346,6 +2414,11 @@
     "type": "boolean",
     "value": false
   },
+  "task.file": {
+    "description": "Let the task tool read subagent instructions from a file (taskFile), recording its path and SHA-256.",
+    "type": "boolean",
+    "value": false
+  },
   "task.isolation.apply": {
     "description": "Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts",
     "type": "boolean",
@@ -2372,7 +2445,7 @@
     "value": 32
   },
   "task.maxEffort": {
-    "description": "Maximum reasoning effort allowed for the task tool's per-spawn effort hint. Lower values prevent callers from escalating subagents above this ceiling; the default preserves the model's full range.",
+    "description": "Maximum reasoning effort allowed for the task tool's per-spawn effort hint or a per-call model. An explicit `:level` is clamped to the highest supported effort at or below this ceiling, and an omitted `:level` inherits the agent's thinking level capped at this value; cold revival re-applies the cap. Unset, `:inherit` and `:off` keep their existing meaning. A per-call model must support an effort at or below this ceiling; the default preserves the model's full range.",
     "type": "enum",
     "value": "max"
   },
@@ -2385,6 +2458,16 @@
     "description": "Hard wall-clock limit per subagent (ms). 0 disables it. Defense-in-depth against provider-side stream hangs that escape the inference-layer watchdog; triggers a normal subagent abort with a 'timed out' reason.",
     "type": "number",
     "value": 0
+  },
+  "task.perCallModel": {
+    "description": "Whether a subagent call may pick its model with one exact provider/model-id[@upstream][:level] selector. An @upstream pin is part of the model identity and is supported only by aggregators. Only models the configuration already routes to are accepted. Project settings can turn it off but not on, and never approve a model.",
+    "type": "enum",
+    "value": "off"
+  },
+  "task.perCallModelAllow": {
+    "description": "Exact selectors: `provider/model-id`, including `@upstream` only for a pinned OpenRouter/Vercel route (e.g. `openrouter/x@y`). When set, a per-call model must also be listed here. Empty: every model the configuration grants. A project list can only narrow this one.",
+    "type": "array",
+    "value": []
   },
   "task.prewalk": {
     "description": "Arm prewalk for the bundled generic `task` subagent: it starts on its resolved model, plans and begins the implementation, then hands off to the 'smol' role at its first edit/write. Per-agent overrides (task.agentPrewalk, configured from the /agents hub) and user agent `prewalk` frontmatter apply regardless of this toggle.",
@@ -2526,6 +2609,11 @@
     "type": "enum",
     "value": "nf+emoji"
   },
+  "title.refreshAfterPrompts": {
+    "description": "Every this many operator prompts, ask the judge model whether a generated session title still fits the conversation, and regenerate it if not",
+    "type": "number",
+    "value": 0
+  },
   "title.refreshOnReplan": {
     "description": "Refresh generated session titles after todo init replans unless the title was set by the user",
     "type": "boolean",
@@ -2611,6 +2699,11 @@
     "type": "number",
     "value": 768
   },
+  "tools.restrictedFolders": {
+    "description": "Folders where every read, write, edit, search, or command needs an explicit approval, whatever the approval mode or a remembered grant. The folder and everything under it is restricted; commands are matched by the directory they run in. A JSON list of paths, e.g. [\"~/secrets\"].",
+    "type": "array",
+    "value": []
+  },
   "tools.speculativeExecution.enabled": {
     "description": "Enable the discard-safe first slice: validated local reads through direct read calls and nested eval. Network requests, provider completions, and live filesystem writes are not part of this baseline.",
     "type": "boolean",
@@ -2635,6 +2728,11 @@
     "description": "When xd:// Prompt Docs is Built-ins Only, inline dynamic devices whose names match these glob patterns (for example mcp__context_mode_*). Catalog Only ignores this setting.",
     "type": "array",
     "value": []
+  },
+  "tools.xdevNotices": {
+    "description": "Show an `xd://: mounted …` notice when MCP or extension tools are mounted or unmounted. The model still learns of the change with its next prompt.",
+    "type": "boolean",
+    "value": true
   },
   "topK": {
     "description": "Sample from top-K tokens (-1 = provider default)",
@@ -2704,7 +2802,7 @@
   "tui.autoGraph": {
     "description": "Draw a chart under numeric tables in the agent's answers, in your theme's colors, on terminals that show graphics",
     "type": "enum",
-    "value": "always"
+    "value": "auto"
   },
   "tui.codexResetFireworks": {
     "description": "Celebrate unscheduled Codex weekly usage resets and newly banked saved resets with a top-third fireworks overlay that remains until ⎋",
@@ -2742,7 +2840,7 @@
     "value": 8
   },
   "tui.mouse": {
-    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target. Native text selection becomes ⇧+drag and wheel scroll becomes ⇧+wheel while on",
+    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target, and clicks on extension-owned links reach their extension (the link-hint key picks them without the mouse). Native text selection becomes ⇧+drag and wheel scroll becomes ⇧+wheel while on",
     "type": "boolean",
     "value": false
   },

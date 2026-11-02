@@ -35,7 +35,7 @@ COMMANDS
   render         Draw a session's entire thread through the production transcript pipeline (with repaint timing)
   say            Synthesize text with the local TTS engine and play it through the speakers
   search         Test web search providers
-  session        Hand a session to another machine: pack it, unpack it, or mark the local copy moved
+  session        Hand a session to another machine (pack, unpack, moved) or check which sessions a running omp owns (lease)
   setup          Run onboarding setup or install dependencies for optional features
   share          Share a saved session via an encrypted link (same as /share)
   shell          Interactive shell console

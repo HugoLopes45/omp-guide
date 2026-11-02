@@ -1,5 +1,5 @@
 FLAGS
-      --model=<value>                   Model to use (fuzzy match: "opus", "gpt-5.2", or "openai/gpt-5.2")
+      --model=<value>                   Model to use (fuzzy match: "opus", "gpt-5.2"; exact with a provider: "openai/gpt-5.2")
       --smol=<value>                    Smol/fast model for lightweight tasks (or PI_SMOL_MODEL env)
       --slow=<value>                    Slow/reasoning model for thorough analysis (or PI_SLOW_MODEL env)
       --plan=<value>                    Plan model for architectural planning (or PI_PLAN_MODEL env)
@@ -38,6 +38,7 @@ FLAGS
       --service-tier=<value>            OpenAI service tier for this session (none omits service_tier)
       --hide-thinking                   Hide thinking blocks in TUI output (display only, does not disable model thinking)
       --advisor                         Enable the advisor runtime (passively reviews each turn and injects notes)
+      --wait-async                      Print mode: before exiting, wait for this run's background jobs and wake the session with each result (async.printWake); no time limit unless --max-time is set
       --external-thinking               Use a private scratchpad while disabling supported GPT, Claude, and Gemini reasoning (at your own risk: providers have flagged this request shape as abuse)
       --hook=<value>                    Load a hook/extension file (can be used multiple times)
   -e, --extension=<value>               Load an extension file (can be used multiple times)
@@ -45,11 +46,14 @@ FLAGS
       --no-skills                       Disable skills discovery and loading
       --skills=<value>                  Comma-separated glob patterns to filter skills (e.g., git-*,docker)
       --no-rules                        Disable rules discovery and loading
+      --no-context-files                Disable context files (AGENTS.md, CLAUDE.md, ...)
       --export=<value>                  Export session file to HTML and exit
       --no-title                        Disable title auto-generation
       --no-ui                           With --mode rpc or rpc-ui: run extensions headless (rpc-ui tool UI remains enabled)
       --print-thoughts                  Include thinking blocks in print mode text output
       --max-time=<value>                Stop the session after this duration (e.g., 600, 10m, 1h)
+      --warn-cost=<value>               Warn once when the session's spend, subagents included, reaches this many USD
+      --max-cost=<value>                Stop sending model requests once the session's spend reaches this many USD; requests already in flight can finish past it (print mode exits 3)
       --auto-approve                    Auto-approve all tool calls (skip approval prompts)
       --approval-mode=<value>           Override tools.approvalMode for this session (always-ask|always-ask-cached|write|yolo)
 
