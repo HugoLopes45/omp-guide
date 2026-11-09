@@ -285,6 +285,11 @@
     "type": "boolean",
     "value": true
   },
+  "btw.inject": {
+    "description": "When you ask /btw for a steering prompt, it drafts one in <inject> tags, highlighted in the answer; Alt+I (app.btw.inject) sends it to the main session",
+    "type": "boolean",
+    "value": false
+  },
   "checkpoint.enabled": {
     "description": "Enable the checkpoint and rewind tools for context checkpointing",
     "type": "boolean",
@@ -519,6 +524,11 @@
     "type": "enum",
     "value": "on"
   },
+  "composer.predictionAlternatives": {
+    "description": "Ask for up to four distinct predictions instead of one, most likely first. The ghost text shows the first one your draft matches; after inserting one, press ⇥ again to pick another. The same single request returns a few more output tokens",
+    "type": "boolean",
+    "value": false
+  },
   "composer.predictions": {
     "description": "After a completed turn, ask the active model to predict your next message and show it as ghost text in the empty composer; ⇥ or → inserts it without sending. Extra usage: every completed turn sends one more billed request over the whole conversation (counted in /stats)",
     "type": "boolean",
@@ -647,8 +657,13 @@
     "type": "enum",
     "value": "collapsed"
   },
+  "display.shellVisualization": {
+    "description": "Show bash commands as an interactive execution visualization instead of plain shell commands",
+    "type": "boolean",
+    "value": true
+  },
   "display.shimmer": {
-    "description": "Animation style for working/loading messages",
+    "description": "Animation style for working/loading messages; off under reduced or no Motion",
     "type": "enum",
     "value": "classic"
   },
@@ -663,7 +678,7 @@
     "value": false
   },
   "display.smoothStreaming": {
-    "description": "Reveal assistant text and streamed tool input smoothly while chunks arrive",
+    "description": "Reveal assistant text and streamed tool input smoothly while chunks arrive (Tern types assistant text out itself)",
     "type": "boolean",
     "value": true
   },
@@ -708,7 +723,7 @@
     "value": 0.95
   },
   "edit.mode": {
-    "description": "Select the edit tool variant (replace, patch, hashline, or apply_patch)",
+    "description": "Select the edit tool variant (replace, patch, hashline, or apply_patch); none removes the edit tool and keeps bash enabled",
     "type": "enum",
     "value": "hashline"
   },
@@ -817,6 +832,11 @@
     "type": "boolean",
     "value": false
   },
+  "extensionRenderers.transcriptPresenters": {
+    "description": "Let extensions draw transcript blocks such as tool calls in full, as one compact row, or hidden; the session, exports and model context are unchanged",
+    "type": "boolean",
+    "value": false
+  },
   "extensions": {
     "description": "",
     "type": "array",
@@ -901,6 +921,16 @@
     "description": "",
     "type": "number",
     "value": 20
+  },
+  "gc.strip": {
+    "description": "",
+    "type": "boolean",
+    "value": false
+  },
+  "gc.stripAfterDays": {
+    "description": "",
+    "type": "number",
+    "value": 30
   },
   "gc.wal": {
     "description": "",
@@ -1012,6 +1042,11 @@
   },
   "hindsight.debug": {
     "description": "",
+    "type": "boolean",
+    "value": false
+  },
+  "hindsight.globalScope": {
+    "description": "Let retain and learn take scope: global, which stores a memory without the project tag so every project recalls it. Needs global or per-project-tagged scoping",
     "type": "boolean",
     "value": false
   },
@@ -1304,8 +1339,13 @@
     "type": "boolean",
     "value": true
   },
+  "magicKeywords.chillax": {
+    "description": "Let standalone chillax drop thinking to the model's lowest effort (models with per-message effort, even mid-turn) and append its hidden notice",
+    "type": "boolean",
+    "value": true
+  },
   "magicKeywords.enabled": {
-    "description": "Enable hidden notices for standalone ultrathink, orchestrate, workflowz, jevify keywords",
+    "description": "Enable hidden notices for standalone ultrathink, chillax, orchestrate, workflowz, jevify keywords",
     "type": "boolean",
     "value": true
   },
@@ -1464,7 +1504,7 @@
     "type": "string"
   },
   "mnemopi.dbPath": {
-    "description": "Optional SQLite DB path. Defaults to the agent memories directory.",
+    "description": "Optional SQLite DB path; a leading ~ is the home directory. Defaults to the agent memories directory.",
     "type": "string"
   },
   "mnemopi.debug": {
@@ -1623,6 +1663,10 @@
     "type": "boolean",
     "value": true
   },
+  "ovnfs.path": {
+    "description": "ovnfs executable; unset looks for `ovnfs` on PATH. When it is found, ovnfs checkouts (copy-on-write views of a folder, ready in about a second at any size) serve every separate copy: the system prompt tells agents to open checkouts instead of git worktrees or copies, and isolated subagents (when allowed, with `isolation.backend` on auto) run in checkouts instead of native clones",
+    "type": "string"
+  },
   "paste.largeMenuThreshold": {
     "description": "When a paste reaches this many lines, offer a menu to wrap it in a code block, wrap it in XML tags, or save it to a file. 0 disables the menu (large pastes still collapse to a [Paste] marker).",
     "type": "number",
@@ -1767,8 +1811,13 @@
     "type": "boolean",
     "value": false
   },
+  "providers.openaiResponsesWebsockets": {
+    "description": "Opt in for catalog-supported standard Responses models; model or request false disables it",
+    "type": "boolean",
+    "value": false
+  },
   "providers.openaiWebsockets": {
-    "description": "Websocket policy for OpenAI Codex models (auto uses model defaults, on forces, off disables)",
+    "description": "WebSocket policy for OpenAI Codex models only",
     "type": "enum",
     "value": "auto"
   },
@@ -2157,6 +2206,11 @@
     "type": "array",
     "value": []
   },
+  "skills.manualSkills": {
+    "description": "",
+    "type": "array",
+    "value": []
+  },
   "skills.registryUrl": {
     "description": "Skillshare registry used by `omp skill` to install, search, and publish skills (https://host[:port])",
     "type": "string",
@@ -2221,6 +2275,48 @@
     "description": "Mark misspelled prompt words with the active macOS dictionaries",
     "type": "boolean",
     "value": true
+  },
+  "spotlight.experiment.enabled": {
+    "description": "Shape tool output and rank find results with Stencil Spotlight, and log each shaped result to the session",
+    "type": "boolean",
+    "value": false
+  },
+  "spotlight.experiment.holdout": {
+    "description": "",
+    "type": "number",
+    "value": 0.05
+  },
+  "spotlight.experiment.scoreFree": {
+    "description": "",
+    "type": "number",
+    "value": 0.15
+  },
+  "spotlight.experiment.tools": {
+    "description": "",
+    "type": "array",
+    "value": [
+      "*"
+    ]
+  },
+  "spotlight.model": {
+    "description": "",
+    "type": "string",
+    "value": "whiskers-latest"
+  },
+  "spotlight.thinking": {
+    "description": "",
+    "type": "enum",
+    "value": "low"
+  },
+  "spotlight.timeoutMs": {
+    "description": "",
+    "type": "number",
+    "value": 5000
+  },
+  "spotlight.url": {
+    "description": "",
+    "type": "string",
+    "value": "https://cloud.stencil.so/v1/spotlight"
   },
   "startup.changelogMode": {
     "description": "Choose whether update notes start as a summary, full details, or stay hidden",
@@ -2400,7 +2496,7 @@
     "value": []
   },
   "task.eager": {
-    "description": "How strongly to push delegating work to subagents",
+    "description": "How strongly to push the main agent to delegate work; subagents keep the model's own policy",
     "type": "enum",
     "value": "default"
   },
@@ -2499,6 +2595,11 @@
     "type": "boolean",
     "value": false
   },
+  "task.workerThreads": {
+    "description": "Maximum worker threads for subagents. Up to 8 concurrent subagents run on the main thread; at 9 one worker joins, and one more each time the count doubles (18, 36, 72). Workers stop a minute after no subagent is live in them; 0 keeps every subagent on the main thread",
+    "type": "number",
+    "value": 4
+  },
   "tasks.todoClearDelay": {
     "description": "Delay before completed or abandoned todos are removed from the todo widget",
     "type": "number",
@@ -2532,7 +2633,7 @@
   "textVerbosity": {
     "description": "OpenAI Responses and Codex response verbosity (low, medium, or high)",
     "type": "enum",
-    "value": "medium"
+    "value": "low"
   },
   "theme.dark": {
     "description": "Theme used when the terminal has a dark background",
@@ -2809,6 +2910,11 @@
     "type": "boolean",
     "value": false
   },
+  "tui.colorfulMarkdown": {
+    "description": "Color headings by level, bold and italic text, inline code, and table headers from the theme's ANSI palette. Off uses one heading color and plain bold/italic.",
+    "type": "boolean",
+    "value": true
+  },
   "tui.completeScrollback": {
     "description": "Send transcript rows pushed off screen by a growing HUD or dialog straight to scrollback; when it shrinks, blank rows sit between the transcript and the input until new output fills them",
     "type": "boolean",
@@ -2823,6 +2929,11 @@
     "description": "Move the prompt's bottom border to a separate row so macOS IME preedit cannot displace it",
     "type": "boolean",
     "value": false
+  },
+  "tui.maxFps": {
+    "description": "Ceiling on how often the TUI repaints, streaming text included. Keystroke echo keeps 30 fps, so the pane you type in stays responsive",
+    "type": "number",
+    "value": 30
   },
   "tui.maxInlineImageColumns": {
     "description": "",
@@ -2839,8 +2950,13 @@
     "type": "number",
     "value": 8
   },
+  "tui.motion": {
+    "description": "One switch over spinners, shimmer, and decorative blink/fade. Streaming text is unaffected (see Max Frames Per Second). A spinner interval you set still wins",
+    "type": "enum",
+    "value": "full"
+  },
   "tui.mouse": {
-    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target, and clicks on extension-owned links reach their extension (the link-hint key picks them without the mouse). Native text selection becomes ⇧+drag and wheel scroll becomes ⇧+wheel while on",
+    "description": "Capture mouse clicks in the main session so live subagent cards and HUD rows focus on click, with a hover highlight on the target, and clicks on extension-owned links reach their extension (the link-hint key picks them without the mouse). Native text selection becomes ⇧+drag while on, and mouse capture stops wheel scrolling — the terminal reports wheel ticks to omp instead — so scroll with the terminal's keyboard scrollback keys, or turn this off",
     "type": "boolean",
     "value": false
   },
@@ -2863,6 +2979,10 @@
     "description": "How a settled terminal resize refreshes transcript rows retained in terminal scrollback",
     "type": "enum",
     "value": "rebuild"
+  },
+  "tui.spinnerInterval": {
+    "description": "Milliseconds between frames of every spinner, the terminal title included; 0 shows static glyphs. Unset follows Motion",
+    "type": "number"
   },
   "tui.textSizing": {
     "description": "Render Markdown H1 headings at 2x scale using Kitty's OSC 66 text-sizing protocol. Only takes effect on Kitty terminals; ignored everywhere else. Off by default.",
@@ -2893,6 +3013,11 @@
     "description": "How the current Vim mode appears in the status line",
     "type": "enum",
     "value": "text"
+  },
+  "update.auto": {
+    "description": "Install omp updates in the background on startup; the next launch runs the new version",
+    "type": "boolean",
+    "value": false
   },
   "update.channel": {
     "description": "Update channel used by omp update and the startup update check",

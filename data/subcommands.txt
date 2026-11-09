@@ -5,6 +5,7 @@ COMMANDS
   auth           Export or import stored provider credentials (API keys and OAuth logins) as JSON
   auth-broker    Manage the omp auth-broker (credential vault)
   auth-gateway   Run an auth-gateway: an HTTP forward proxy backed by the configured broker, or JSON lines on stdio with your own credentials
+  bash           Run bash 5.3 on the built-in pi-shell engine (all arguments go to bash)
   bench          Benchmark models: TTFT/prefill vs decode throughput with p50/p95, across chat, prefill, generation, and prompt-cache workloads, or single-user vs parallel load (--detailed)
   browser-relay  Run the local CDP relay that lets the browser prelude drive your own Chrome tabs
   cleanse        Detect and fix project diagnostics with weighted parallel subagents
@@ -37,6 +38,7 @@ COMMANDS
   search         Test web search providers
   session        Hand a session to another machine (pack, unpack, moved) or check which sessions a running omp owns (lease)
   setup          Run onboarding setup or install dependencies for optional features
+  sh             Run a POSIX sh on the built-in pi-shell engine (all arguments go to sh)
   share          Share a saved session via an encrypted link (same as /share)
   shell          Interactive shell console
   skill          Install, search, publish, and manage skills on the Skillshare registry (skills.omp.sh)
@@ -50,4 +52,5 @@ COMMANDS
   update         Check for and install updates
   usage          Show provider usage limits for every authenticated account
   worktree       Add, list, or clear git worktrees (clone-first when enabled)
+  zsh            Run zsh 5.9 on the built-in pi-shell engine (all arguments go to zsh)
 
