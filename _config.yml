@@ -9,6 +9,41 @@ defaults:
       path: ""
     values:
       layout: default
+  - scope:
+      path: "README.md"
+    values:
+      seo_title: "omp guide: the unofficial beginner guide to oh-my-pi (omp)"
+      description: "Learn oh-my-pi (omp), the terminal coding agent: install, first session, cheat sheet, settings, multi-agent work, and the traps that cost an afternoon."
+  - scope:
+      path: "getting-started.md"
+    values:
+      seo_title: "Getting started with oh-my-pi (omp)"
+      description: "Install omp, log in to a provider, pick models per role, and run a first safe session with plan mode, approvals, and the keys that matter."
+  - scope:
+      path: "cheatsheet.md"
+    values:
+      seo_title: "oh-my-pi (omp) cheat sheet: commands, keys, flags"
+      description: "Every omp subcommand, CLI flag, slash command, keybinding, URL scheme, and file location on one page, checked against a live install."
+  - scope:
+      path: "settings.md"
+    values:
+      seo_title: "oh-my-pi (omp) settings explained"
+      description: "Where an omp setting value comes from, which approval mode to choose, a small first config, and a searchable list of every shipped default."
+  - scope:
+      path: "tips.md"
+    values:
+      seo_title: "oh-my-pi (omp) tips and tricks"
+      description: "High-payoff omp habits: model roles, /omfg rules, plan mode, context control, memory, anchored edits, eval, and background jobs."
+  - scope:
+      path: "multi-agent.md"
+    values:
+      seo_title: "oh-my-pi (omp) subagents and parallel work"
+      description: "Run omp subagents safely: isolation, the task tool, bundled agents, the advisor, vibe mode, and background jobs with wait and proc://."
+  - scope:
+      path: "traps.md"
+    values:
+      seo_title: "oh-my-pi (omp) traps and gotchas"
+      description: "Config, autonomy, mode, and cost mistakes that waste real time in omp, with the setting or command that avoids each one."
 
 exclude:
   - scripts

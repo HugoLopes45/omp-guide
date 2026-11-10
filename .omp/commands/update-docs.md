@@ -9,14 +9,17 @@ Work from the repo root. $ARGUMENTS
 ## Ground truth, in order
 
 1. The omp binary on this machine: `omp --version`, `omp --help`, `omp help`, `omp config list --json` (use `omp --profile guide-snapshot` so values are pure defaults).
-2. The upstream repo and release notes: https://github.com/can1357/oh-my-pi (docs/, releases).
-3. This repo's snapshots in `data/` (they define what the guide was last verified against).
+2. The upstream repo: https://github.com/can1357/oh-my-pi. Raw docs under `docs/` and `docs/tools/` (fetch from raw.githubusercontent.com; list with the GitHub contents API), and `packages/coding-agent/CHANGELOG.md` for every release since `data/version.txt`.
+3. The official user docs at https://omp.sh/docs (HTML only). They can lag the binary: on conflict, the binary wins.
+4. This repo's snapshots in `data/` (they define what the guide was last verified against).
 
-Never state a fact you did not verify against 1 or 2 this run. If a claim cannot be verified, remove or rephrase it as unverified rather than guessing.
+Slash commands are not in `--help`. Check a command exists in the installed binary's registry (`strings` on the binary, look for `name: "<cmd>"` followed by `description:`) or in `docs/slash-command-internals.md`.
+
+Never state a fact you did not verify against 1 to 3 this run. If a claim cannot be verified, remove or rephrase it as unverified rather than guessing.
 
 ## Process
 
-1. Run `sh scripts/snapshot.sh`, then `git diff -- data`. This diff is your work list. Also read any open issues labeled `omp-release`; they may contain diffs from CI runs on other platforms.
+1. Run `sh scripts/snapshot.sh`, then `git diff -- data`. This diff plus the CHANGELOG entries since the old version are your work list; the snapshot misses tool and slash-command changes. Also read any open issues labeled `omp-release`; they may contain diffs from CI runs on other platforms.
 2. If the diff is empty and no `omp-release` issue is open: report "no drift" and stop.
 3. For each changed key, default, subcommand, or flag:
    - Find every mention across `*.md` with grep (search the key name AND its old value).

@@ -1,13 +1,13 @@
 # Getting started
 
-*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt); drift from newer releases is tracked automatically in the issues.*
+*Verified against the omp release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt); drift from newer releases is tracked automatically in the issues. Official walkthrough: [Quickstart](https://omp.sh/docs/quickstart).*
 
 ## Install
 
 ```sh
 curl -fsSL https://omp.sh/install | sh          # macOS / Linux
 brew install can1357/tap/omp                    # Homebrew
-bun install -g @oh-my-pi/pi-coding-agent        # Bun >= 1.3.14
+bun install -g @oh-my-pi/pi-coding-agent        # Bun >= 1.4.4
 irm https://omp.sh/install.ps1 | iex            # Windows PowerShell, native
 mise use -g github:can1357/oh-my-pi             # pinned versions
 ```
@@ -30,7 +30,7 @@ Log in to a provider with `/login` inside the TUI. omp routes across providers b
 | Input | What it does |
 |---|---|
 | `/plan` | Read-only planning mode. The agent writes an execution spec to `local://<slug>-plan.md` and hands you the approval. Read the file. |
-| `Shift+Tab` | Cycle the thinking (reasoning) level live. A bare `ultrathink` in your prompt buys one maximum-depth turn. |
+| `Shift+Tab` | Cycle the thinking (reasoning) level live. A bare `ultrathink` in your prompt buys one deep turn; `chillax` one quick one. |
 | `Ctrl+P` | Cycle role models forward (`Shift+Ctrl+P` back, `Alt+P` temporary pick). |
 | `/omfg` | The agent just did the annoying thing? This forges a permanent stream rule from your complaint. Free until it fires. |
 
@@ -69,3 +69,4 @@ Same engine, no TUI. See the [cheat sheet](cheatsheet.md#launch-flags) for the f
 - [Cheat sheet](cheatsheet.md): the whole surface on one page.
 - [Settings](settings.md): the config model, and the decision you must make about approvals.
 - [Traps](traps.md): read this before your first fan-out.
+- [Official docs](https://omp.sh/docs): the full reference, one page per feature.

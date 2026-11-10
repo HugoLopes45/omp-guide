@@ -14,9 +14,9 @@ The agent reaches for a banned API, ignores a convention, does the thing again. 
 
 `/plan` (or `Alt+Shift+P`) makes the agent hard read-only and produces an execution spec at `local://<slug>-plan.md`. The quality bar: a competent implementer who never saw your conversation could execute the file top to bottom with zero design decisions. Read the plan before approving. Trap: the `--plan` flag sets the plan role's *model*; it does not enter plan mode.
 
-## `ultrathink`, one word, one deep turn
+## `ultrathink` and `chillax`, one word, one turn
 
-A bare `ultrathink` in your prompt requests maximum reasoning for that turn only. Cheaper than raising `defaultThinkingLevel` globally; `Shift+Tab` cycles the level live when you want it for a stretch.
+A bare, lowercase `ultrathink` in your prompt asks for careful reasoning on that turn. With `defaultThinkingLevel: auto` it also selects the model's highest effort. `chillax` is the opposite: brief reasoning, lowest effort. Both are cheaper than changing `defaultThinkingLevel` globally; `Shift+Tab` cycles the level live for a stretch. They are ignored inside code spans, fences and paths. Reference: [Magic keywords](https://github.com/can1357/oh-my-pi/blob/main/docs/magic-keywords.md).
 
 ## Know your context exits
 
@@ -50,11 +50,11 @@ omp bench             # race your models: TTFT, tokens/s
 
 ## Edits are anchored, not guessed
 
-The default edit mode (`hashline`) anchors patches to a content hash of the file minted by the last `read`. A stale edit is *rejected with a diff of what changed*, never misapplied. If you see `MismatchError`, the file moved under the agent; that is the system working.
+The default edit mode (`hashline`) anchors patches to a content hash of the file minted by the last `read`. A stale edit is recovered when the snapshot chain proves one safe result; otherwise it is *rejected with the current tag and context*, never misapplied. Edits anchored on lines the agent never displayed in full are refused too (`edit.enforceSeenLines`). A `stale_tag` or `unseen_lines` error means the guard worked. Reference: [edit tool](https://github.com/can1357/oh-my-pi/blob/main/docs/tools/edit.md).
 
 ## `eval` beats `bash: python -c`
 
-The `eval` tool runs persistent Python and JS cells with shared state, structured display, and cancellation. It can call back into the agent's own tools (`tool.read(...)`, `agent(...)`, `parallel(...)`), which turns "spawn some subagents" into a loop with a budget. Shelling out to `python -c` loses all of that.
+The `eval` tool runs persistent Python and JS cells with shared state, structured display, and cancellation. It can call back into the agent's own tools (`tool.read(...)`, `agent(...)` with `wait(...)`, `workpool(...)`, `completion(...)`), which turns "spawn some subagents" into a loop with a budget. Shelling out to `python -c` loses all of that.
 
 ## Everything is a path
 
@@ -70,7 +70,7 @@ The `eval` tool runs persistent Python and JS cells with shared state, structure
 
 ## Let long commands background themselves
 
-`bash.autoBackground` (on by default) moves anything slow into a managed background job instead of blocking the turn. The `hub` tool then greps its logs, follows them, restarts it, or sends it keystrokes. Dev servers and watchers stop being a reason the agent "hangs".
+Auto-backgrounding (`bash.autoBackground.enabled`, on by default, after 60s) moves anything slow into a managed job instead of blocking the turn; the result auto-delivers. For dev servers and watchers, the agent starts a named service (`bash` with `name` and a `ready` port or log regex), then inspects it with `read proc://<name>` and stops it with `write proc://<name>/kill`. They stop being a reason the agent "hangs". Details in [Multi-agent](multi-agent.md#background-jobs-and-services-wait-and-proc).
 
 ## Import your history from other tools
 

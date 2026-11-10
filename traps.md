@@ -26,15 +26,19 @@
 
 **`--plan` is not plan mode.** The flag sets which model the `plan` *role* uses. Plan mode is `/plan` or `Alt+Shift+P`. The launch flag that does start a session planning is `--plan-yolo`.
 
-**`isolated: true` does nothing until you enable isolation.** Set `task.isolation.enabled` to `true` (ships as `false`) before spawning writers. `isolation.backend` ships as `auto`; a git repo and plan mode off are still required. Fanning out writers without isolation means siblings clobber each other.
+**`isolated: true` does nothing until you enable isolation.** Set `task.isolation.enabled` to `true` (ships as `false`) before spawning writers. `isolation.backend` ships as `auto`; an isolated task still needs a git repo, and the `isolated` field disappears in plan mode. Fanning out writers without isolation means siblings clobber each other.
 
-**`/vibe`, `/goal`, `/loop` are modes, not commands.** They stay on until toggled off, and vibe is exclusive with plan and goal, even paused ones. Leaving vibe kills every worker.
+**`/vibe`, `/goal`, `/loop` are modes, not commands.** They stay on until toggled off, and vibe is exclusive with plan and goal, even paused ones. Leaving vibe cancels every in-flight worker turn.
 
 ## Expectation traps
 
 **"It'll remember" - no.** `memory.backend` ships `off`. Nothing persists between sessions until you turn it on.
 
 **`alwaysApply: true` on every rule eats your window.** A rule with `alwaysApply` injects its full body into every system prompt. Use it for the two lines that are non-negotiable; give everything else a `description` (fetched on demand) or a `condition` (a TTSR rule, free until it fires).
+
+**`ultrathink` only raises effort under automatic thinking.** With `defaultThinkingLevel: auto` it picks the model's highest effort for that turn. On a pinned level it only adds a "reason carefully" notice. `chillax` is its opposite, and on a pinned level the lowered effort sticks until you change it.
+
+**Old `hub` tutorials are dead.** The `hub` tool is gone: background jobs and services are now `wait` plus `read`/`write proc://<id>`. `/hub` still exists, but it is the Agent Hub screen, not the tool.
 
 **Old hashline tutorials teach dead syntax.** v17.2.2 (2026-07) replaced `SWAP`/`INS`/`DEL` with `PUT`/`CUT`. The old op names no longer parse.
 

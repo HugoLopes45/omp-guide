@@ -1,14 +1,8 @@
-<div class="settings-hero">
+<div class="settings-hero" markdown="1">
 
 # Settings, demystified
 
-This page answers four first questions: where a value comes from, which approval mode to choose, what to put in a first config, and what to add later. *Verified against the release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt).*
-
-<dl class="settings-stats">
-  <div><dt>480+</dt><dd>settings</dd></div>
-  <div><dt>5</dt><dd>resolution layers</dd></div>
-  <div><dt>3</dt><dd>first decisions</dd></div>
-</dl>
+This page answers four first questions: where a value comes from, which approval mode to choose, what to put in a first config, and what to add later. *Verified against the release in [`data/version.txt`](https://github.com/HugoLopes45/omp-guide/blob/main/data/version.txt). Official references: [Settings](https://omp.sh/docs/settings), [Approvals](https://omp.sh/docs/approvals).*
 
 </div>
 
@@ -43,9 +37,12 @@ Useful commands:
 omp config list --json   # every key with its effective value
 omp config get <key>
 omp config set <key> <value>
+omp config reset <key>   # writes the default to global config; it does not delete the key
 omp config path          # which directory the global config lives in
 /settings                # same thing with a UI
 ```
+
+`omp config set` and `reset` always write the global (or active profile) file, never the project file: edit `<cwd>/.omp/config.yml` by hand. A running session does not watch config files; `/settings` changes apply live, but shell or editor changes apply at the next launch. Invalid YAML is moved aside as `config.yml.broken-*` and startup stops, so nothing is lost.
 
 ## 2. Which approval mode should I choose?
 
@@ -54,11 +51,15 @@ Fresh installs default to `yolo`. Start with `write`: read and workspace-write t
 <div class="approval-options">
   <section>
     <h3><code>always-ask</code></h3>
-    <p>Approve each tool action yourself.</p>
+    <p>Approve each write and exec action yourself. Reads stay automatic.</p>
   </section>
   <section>
     <h3><code>write</code> recommended</h3>
     <p>Keep reads and workspace writes automatic. Approve exec-tier actions.</p>
+  </section>
+  <section>
+    <h3><code>always-ask-cached</code></h3>
+    <p>"Ask and remember": also asks before file reads, and lets you grant a file or folder once, for this session or across sessions.</p>
   </section>
   <section>
     <h3><code>yolo</code></h3>
@@ -78,6 +79,8 @@ bash:
     - { match: "git status*", approval: allow }
     - { match: "rm -r*", approval: deny }
 ```
+
+`tools.restrictedFolders` lists folders where every action prompts, whatever the mode, `yolo` and remembered grants included. Use it for `~/secrets`-type paths. `/forget-approvals` clears every "Ask and remember" grant.
 
 Under `yolo`, only `deny` and `prompt` rules change bash behavior. `deny` blocks, `prompt` asks, and allow rules must match the full command while deny and prompt inspect compound-command segments. **`eval` needs its own approval policy:** Python and JavaScript cells can spawn exec-tier shells, so use `tools.approval.eval` when that boundary matters.
 
