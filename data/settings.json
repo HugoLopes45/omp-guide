@@ -55,7 +55,7 @@
     "value": "on"
   },
   "ask.timeout": {
-    "description": "Auto-select the recommended ask option after this many seconds (0 disables). Also bounds cfg:// approval prompts; an unanswered approval denies the write instead of auto-selecting",
+    "description": "Submit an ask form's current values (your preselected answers) after this many seconds (0 disables). Also bounds cfg:// approval prompts; an unanswered approval denies the write instead of auto-submitting",
     "type": "number",
     "value": 0
   },
@@ -102,6 +102,11 @@
     "description": "",
     "type": "string"
   },
+  "auth.unpausedProviders": {
+    "description": "Turn providers we paused back on: login, token refresh and stored credentials work again. Each pause names the account risk you accept. Project settings cannot set this",
+    "type": "array",
+    "value": []
+  },
   "autoResume": {
     "description": "Automatically resume the most recent session in the current directory. If its model cannot be restored and model fallback is disabled, interactive startup warns and starts a new session without the saved history",
     "type": "boolean",
@@ -131,6 +136,11 @@
     "description": "Evaluate literal && chains per command; unmatched commands use normal bash approval policy and mode",
     "type": "boolean",
     "value": false
+  },
+  "bash.allowedEnvVars": {
+    "description": "Exact environment variable names allowed as leading KEY=VALUE prefixes when matching bash.patterns allow rules (no wildcards). Any value is accepted, so list only benign build/test variables; execution-altering variables (PATH, LD_PRELOAD, BASH_ENV, *_RUNNER, *_WRAPPER) allow arbitrary command execution.",
+    "type": "array",
+    "value": []
   },
   "bash.autoBackground.enabled": {
     "description": "Automatically background long-running bash commands and deliver the result later",
@@ -239,7 +249,7 @@
     "value": 16384
   },
   "browser.cdpUrl": {
-    "description": "Default HTTP CDP discovery endpoint (for example http://127.0.0.1:9222) to attach to instead of launching a browser. Explicit app.cdp_url or app.path on the tool call take precedence.",
+    "description": "Default HTTP CDP discovery endpoint (for example http://127.0.0.1:9222) to attach to instead of launching a browser. An explicit app on the tool call takes precedence.",
     "type": "string"
   },
   "browser.cmux": {
@@ -248,17 +258,17 @@
     "value": true
   },
   "browser.enabled": {
-    "description": "Enable the browser eval prelude for scripted Chromium automation (Puppeteer)",
+    "description": "Enable the browser eval prelude for scripted browser automation",
     "type": "boolean",
     "value": true
   },
   "browser.freezeOnTurnEnd": {
-    "description": "Freeze OMP-owned headless browser tabs when a turn settles so animated pages stop burning CPU/GPU while idle. Tabs unfreeze automatically on next use; pass persist:true on open to opt a tab out.",
+    "description": "Freeze OMP-owned headless Chromium tabs when a turn settles so animated pages stop burning CPU/GPU while idle (WebKit tabs draw nothing unless asked). Tabs unfreeze automatically on next use; pass persist:true on open to opt a tab out.",
     "type": "boolean",
     "value": true
   },
   "browser.headless": {
-    "description": "Launch browser in headless mode (disable to show browser UI)",
+    "description": "Run the browser without a window (disable to show it). omp's WebKit tabs gain or lose their windows at once where the engine ships its viewer (macOS); elsewhere a visible browser is Chromium, launched in the new mode by the next open.",
     "type": "boolean",
     "value": true
   },
@@ -281,9 +291,18 @@
     "type": "string"
   },
   "browser.tern": {
-    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of headless Chromium; falls back to Chromium when no Tern window can host them. Explicit app options, the relay and Browser CDP URL take precedence; app.tern:false opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
+    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of omp's own headless browser; falls back to that browser when no Tern window can host them. An explicit app, the relay and Browser CDP URL take precedence; app \"own\" opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
     "type": "boolean",
     "value": true
+  },
+  "browser.webkit": {
+    "description": "Open browser tabs in omp's own headless WebKit engine instead of managed Chromium when the engine is installed (omp downloads it to ~/.o2/lib/abkit before Chrome for Testing when no browser is installed; see Browser WebKit Path). Chromium still opens a visible browser where the engine ships no viewer, and tabs the engine fails to start; an explicit app, the relay, Browser CDP URL, Tern and cmux take precedence; app \"chromium\" opts one open out. Set PI_BROWSER_WEBKIT=0 or PI_BROWSER_WEBKIT=1 to override.",
+    "type": "boolean",
+    "value": true
+  },
+  "browser.webkitPath": {
+    "description": "omp's WebKit engine: its host executable, or an ABKit engine directory (which holds it as ABHost; ABHost.exe on Windows). If unset, omp runs the installed engine, ~/.o2/lib/abkit/ABHost (ABHost.exe on Windows). Supports ~. PI_BROWSER_WEBKIT_PATH overrides it.",
+    "type": "string"
   },
   "btw.inject": {
     "description": "When you ask /btw for a steering prompt, it drafts one in <inject> tags, highlighted in the answer; Alt+I (app.btw.inject) sends it to the main session",
@@ -409,6 +428,11 @@
     "description": "",
     "type": "number",
     "value": 120000
+  },
+  "commit.enabled": {
+    "description": "Enable the commit eval prelude and /commit: commit only the lines this agent and its subagents wrote",
+    "type": "boolean",
+    "value": true
   },
   "commit.mapBatchTokenBudget": {
     "description": "",
@@ -550,7 +574,7 @@
     "value": false
   },
   "composer.recallClearedDrafts": {
-    "description": "Keep drafts cleared with ⌃C in local ↑/↓ history until exit; disabling affects future clears",
+    "description": "Keep drafts cleared with Ctrl+C in local ↑/↓ history until exit; disabling affects future clears",
     "type": "boolean",
     "value": true
   },
@@ -772,6 +796,11 @@
     "type": "array",
     "value": []
   },
+  "encourageEdits": {
+    "description": "Require the edit tool for file edits and forbid sed/perl/python edits",
+    "type": "boolean",
+    "value": true
+  },
   "error.notify": {
     "description": "Notify when the agent stops with an error",
     "type": "enum",
@@ -876,6 +905,14 @@
     "description": "Enable the find tool: natural-language search for files and line ranges, judged by the judge model role. Auto enables it only when the judge role resolves to a native TypeSafe jev model",
     "type": "enum",
     "value": "auto"
+  },
+  "find.hitThreshold": {
+    "description": "",
+    "type": "number"
+  },
+  "find.verifyModel": {
+    "description": "Model selector (e.g. openrouter/liquid/d1-ultra) tried first for find's passage verification, before the judge role; filename and sketch ranking stay on the judge role. Unset: the judge role verifies too",
+    "type": "string"
   },
   "followUpMode": {
     "description": "How to drain follow-up messages after a turn completes",
@@ -1007,12 +1044,12 @@
   "grep.contextAfter": {
     "description": "Lines of context after each grep match",
     "type": "number",
-    "value": 3
+    "value": 0
   },
   "grep.contextBefore": {
     "description": "Lines of context before each grep match",
     "type": "number",
-    "value": 1
+    "value": 0
   },
   "grep.enabled": {
     "description": "Enable the grep tool for regex content search",
@@ -1299,6 +1336,11 @@
     "type": "boolean",
     "value": true
   },
+  "launch.persist": {
+    "description": "",
+    "type": "boolean",
+    "value": false
+  },
   "live.voice": {
     "description": "Voice used by Codex-backed realtime voice sessions",
     "type": "enum",
@@ -1535,8 +1577,17 @@
     "description": "Optional OpenAI-compatible embedding endpoint passed to Mnemopi",
     "type": "string"
   },
+  "mnemopi.embeddingInputType": {
+    "description": "Send input_type (query for recall, passage for stored memories) with embedding API requests; NVIDIA NIM asymmetric embedders require it",
+    "type": "boolean",
+    "value": false
+  },
   "mnemopi.embeddingModel": {
     "description": "Advanced: explicit embedding model id that overrides the variant. Leave empty to use mnemopi.embeddingVariant.",
+    "type": "string"
+  },
+  "mnemopi.embeddingQueryPrefix": {
+    "description": "Text prepended to recall queries before embedding, for instruction-tuned embedders (Qwen3-Embedding, E5); stored memories are embedded unchanged",
     "type": "string"
   },
   "mnemopi.embeddingVariant": {
@@ -1601,6 +1652,11 @@
     "type": "number",
     "value": 4000
   },
+  "mnemopi.recallRelevance": {
+    "description": "Ask the judge model role whether each automatically recalled memory is relevant to the task before injecting it",
+    "type": "enum",
+    "value": "off"
+  },
   "mnemopi.retainEveryNTurns": {
     "description": "",
     "type": "number",
@@ -1632,7 +1688,7 @@
     "value": true
   },
   "model.toolCallLoopGuard.exemptTools": {
-    "description": "Tool names that may repeat consecutively without triggering the cross-turn loop guard",
+    "description": "Tool names, or xd:// device names of write dispatches (for example mcp__peers_wait), that may repeat consecutively without triggering the cross-turn loop guard",
     "type": "array",
     "value": [
       "wait"
@@ -1667,6 +1723,21 @@
     "description": "",
     "type": "record",
     "value": {}
+  },
+  "models.noJudge": {
+    "description": "",
+    "type": "boolean",
+    "value": false
+  },
+  "models.noSpotlight": {
+    "description": "",
+    "type": "boolean",
+    "value": false
+  },
+  "models.offline": {
+    "description": "",
+    "type": "boolean",
+    "value": false
   },
   "omitThinking": {
     "description": "Instruct upstream providers to completely omit thinking summaries from responses (where supported)",
@@ -2262,17 +2333,17 @@
     "value": "assistant"
   },
   "speech.speed": {
-    "description": "Speaking rate when reading the assistant's output aloud. 1 = normal; clamped to 0.5–2.5",
+    "description": "Speaking rate when reading the assistant's output aloud. 1 = normal; clamped to 0.8–1.3",
     "type": "number",
     "value": 1
   },
   "speech.voice": {
-    "description": "Kokoro voice used when speaking the assistant's output aloud",
+    "description": "Phonon voice used when speaking the assistant's output aloud",
     "type": "enum",
-    "value": "af_heart"
+    "value": "harper"
   },
   "speechgen.enabled": {
-    "description": "Enable the tts tool for on-device (Kokoro) or xAI Grok Voice speech-file synthesis",
+    "description": "Enable the tts tool for on-device (Phonon) or xAI Grok Voice speech-file synthesis",
     "type": "boolean",
     "value": false
   },
@@ -2321,7 +2392,7 @@
   "spotlight.thinking": {
     "description": "",
     "type": "enum",
-    "value": "low"
+    "value": "med"
   },
   "spotlight.timeoutMs": {
     "description": "",
@@ -2455,6 +2526,11 @@
     "type": "enum",
     "value": "unicode"
   },
+  "systemPromptTemplates": {
+    "description": "",
+    "type": "record",
+    "value": {}
+  },
   "task.agentAccountPools": {
     "description": "",
     "type": "record",
@@ -2485,6 +2561,11 @@
     "type": "record",
     "value": {}
   },
+  "task.agentPrewalkAuto": {
+    "description": "",
+    "type": "record",
+    "value": {}
+  },
   "task.agentServiceTierOverrides": {
     "description": "",
     "type": "record",
@@ -2494,6 +2575,11 @@
     "description": "",
     "type": "record",
     "value": {}
+  },
+  "task.autoParallel": {
+    "description": "Ask the native judge resolved through the 'judge' role which parts of each new top-level prompt can run concurrently. Needs a native judge and the task tool; without them nothing is judged.",
+    "type": "enum",
+    "value": "off"
   },
   "task.batch": {
     "description": "Switch the task tool to its batch shape: one call carries { context, tasks[] } — one subagent per item, with an optional per-item agent (defaulting to the session spawn-policy agent), per-item isolation, and a required shared context prepended to every assignment. With async.enabled=true, each spawn runs as an independent background agent with the normal idle/parked lifecycle; otherwise the call blocks for merged results. Disable to restore the flat single-spawn schema.",
@@ -2522,11 +2608,6 @@
   },
   "task.enableLsp": {
     "description": "Allow subagents spawned via the task tool to use the lsp tool. Off by default to keep subagents cheap; enable when LSP-aware delegation is worth the extra tokens.",
-    "type": "boolean",
-    "value": false
-  },
-  "task.file": {
-    "description": "Let the task tool read subagent instructions from a file (taskFile), recording its path and SHA-256.",
     "type": "boolean",
     "value": false
   },
@@ -2604,6 +2685,11 @@
     "description": "Start each batch subagent as soon as its tasks[] item finishes streaming instead of waiting for the whole task call. Launched agents are aborted if the finished call fails validation, is blocked, or its arguments change. Requires auto-allowed task approval and no extension tool lifecycle handlers.",
     "type": "boolean",
     "value": true
+  },
+  "task.steps": {
+    "description": "Spawns take ordered `steps` instead of one `task`: the subagent gets the first step, then each next one once it finishes the previous; past 4 steps, earlier messages carry two or more. The last step's result is the task's result.",
+    "type": "boolean",
+    "value": false
   },
   "task.structured": {
     "description": "Expose outputSchema/schemaMode on the task tool and return subagent results through the yield tool, validated against caller or agent output schemas. Off: task subagents have no yield tool and return their final message as plain text, except agents whose definition sets structured: true. Eval agent()/workpool spawns always keep structured results.",
@@ -2745,6 +2831,11 @@
     "type": "boolean",
     "value": true
   },
+  "todo.midRunNudges": {
+    "description": "How often a long turn is reminded to update its todo list while it keeps changing things",
+    "type": "enum",
+    "value": "capped"
+  },
   "todo.reminders": {
     "description": "Remind the agent to complete todos before stopping",
     "type": "boolean",
@@ -2866,14 +2957,14 @@
     "value": "default"
   },
   "tts.localSpeed": {
-    "description": "Speaking rate of the local TTS backend (tts tool, omp say). 1 = normal; clamped to 0.5–2.5",
+    "description": "Speaking rate of the local TTS backend (tts tool, omp say). 1 = normal; clamped to 0.8–1.3",
     "type": "number",
     "value": 1
   },
   "tts.localVoice": {
-    "description": "Kokoro voice used by the local TTS backend (American/British, female/male)",
+    "description": "Phonon voice used by the local TTS backend (American/British, female/male)",
     "type": "enum",
-    "value": "af_heart"
+    "value": "harper"
   },
   "ttsr.builtinRules": {
     "description": "Load the default rules shipped with the agent (override individually with ttsr.disabledRules)",
@@ -2977,6 +3068,11 @@
   },
   "tui.reactions": {
     "description": "Invite the agent to react to your message with an emoji badge on its bubble",
+    "type": "boolean",
+    "value": true
+  },
+  "tui.renderEmbeds": {
+    "description": "Invite the agent to show pictures with <img> and web pages with <iframe>, loading them (remote addresses included) to draw inline on terminals that show graphics",
     "type": "boolean",
     "value": true
   },

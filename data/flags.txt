@@ -31,9 +31,12 @@ FLAGS
       --no-session                      Don't save session (ephemeral)
       --models=<value>                  Comma-separated model patterns for Ctrl+P cycling
       --no-tools                        Disable all built-in tools
+      --no-judge                        Restrict judge calls to the active model's provider
+      --no-spotlight                    Restrict Spotlight calls to the active model's provider
+      --offline                         Restrict auxiliary services to the active model's provider (not a network firewall)
       --no-lsp                          Disable LSP tools, formatting, and diagnostics
       --no-pty                          Disable PTY-based interactive bash execution
-      --tools=<value>                   Comma-separated list of tools to enable (default: all)
+      --tools=<value>                   Comma-separated built-in or extension tool names to enable (default: tools enabled in settings; see Built-in Tools)
       --thinking=<value>                Set thinking level: off, minimal, low, medium, high, xhigh, max, auto
       --service-tier=<value>            OpenAI service tier for this session (none omits service_tier)
       --hide-thinking                   Hide thinking blocks in TUI output (display only, does not disable model thinking)
