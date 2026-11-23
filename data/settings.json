@@ -238,6 +238,16 @@
       }
     ]
   },
+  "binja.installDir": {
+    "description": "Directory containing the Binary Ninja core library, or the macOS .app bundle; empty uses $BN_INSTALL_DIR, the lastrun file in the Binary Ninja user folder, then the default install locations",
+    "type": "string",
+    "value": ""
+  },
+  "binja.python": {
+    "description": "Python 3 interpreter that can load the Binary Ninja API from the install's python directory; empty auto-detects",
+    "type": "string",
+    "value": ""
+  },
   "branchSummary.enabled": {
     "description": "Prompt to summarize when leaving a branch",
     "type": "boolean",
@@ -253,7 +263,7 @@
     "type": "string"
   },
   "browser.cmux": {
-    "description": "Use cmux WKWebView surfaces for browser automation when a cmux socket is available. Set PI_BROWSER_CMUX=0 or PI_BROWSER_CMUX=1 to override.",
+    "description": "Use cmux WKWebView surfaces for browser automation when a cmux socket is available (not for subagents). Set PI_BROWSER_CMUX=0 or PI_BROWSER_CMUX=1 to override.",
     "type": "boolean",
     "value": true
   },
@@ -278,12 +288,12 @@
     "value": 1800
   },
   "browser.relay": {
-    "description": "Drive your own Chrome tabs through the omp browser relay. Install the extension once (`omp browser-relay install`); the relay server auto-starts when the browser prelude needs it. Takes precedence over Browser CDP URL; set PI_BROWSER_RELAY=0 or PI_BROWSER_RELAY=1 to override.",
+    "description": "Drive your own Chrome tabs through the omp browser relay. Install the extension once (`omp browser-relay install`); its native host serves the relay while Chrome runs. Takes precedence over Browser CDP URL; set PI_BROWSER_RELAY=0 or PI_BROWSER_RELAY=1 to override, or PI_BROWSER_RELAY=only to make it the only browser (sessions started from the extension's side panel). Subagents skip it unless an open passes app: \"relay\" or the relay is the only browser.",
     "type": "boolean",
     "value": false
   },
   "browser.relayUrl": {
-    "description": "omp browser relay endpoint (default http://127.0.0.1:9224).",
+    "description": "Override local browser relay discovery, for example to reach a relay forwarded from another machine.",
     "type": "string"
   },
   "browser.screenshotDir": {
@@ -291,7 +301,7 @@
     "type": "string"
   },
   "browser.tern": {
-    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of omp's own headless browser; falls back to that browser when no Tern window can host them. An explicit app, the relay and Browser CDP URL take precedence; app \"own\" opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
+    "description": "Inside a Tern pane, open browser tabs as picture-in-pictures over omp's pane (native web view) instead of omp's own headless browser; falls back to that browser when no Tern window can host them. Subagents skip it unless an open passes app: \"tern\". An explicit app, the relay and Browser CDP URL take precedence; app \"own\" opts one open out. Set PI_BROWSER_TERN=0 or PI_BROWSER_TERN=1 to override.",
     "type": "boolean",
     "value": true
   },
@@ -571,7 +581,7 @@
   "composer.predictions": {
     "description": "After a completed turn, ask the active model to predict your next message and show it as ghost text in the empty composer; ⇥ or → inserts it without sending. Extra usage: every completed turn sends one more billed request over the whole conversation (counted in /stats)",
     "type": "boolean",
-    "value": false
+    "value": true
   },
   "composer.recallClearedDrafts": {
     "description": "Keep drafts cleared with Ctrl+C in local ↑/↓ history until exit; disabling affects future clears",
@@ -587,11 +597,6 @@
     "description": "Show a live generation tok/s readout: on the working row next to the session title, or in the native composer bar right after the thinking level, where the last reading stays between turns. Estimated from streamed deltas and corrected by the provider's billed output count as each message completes.",
     "type": "boolean",
     "value": false
-  },
-  "computer.backgroundFallback": {
-    "description": "What window input does when its background route is unavailable: rerun it in takeover and return focus to your app (macOS; elsewhere plain takeover), or refuse, which also keeps the agent from taking the foreground or opening macOS menus itself",
-    "type": "enum",
-    "value": "takeover"
   },
   "computer.display": {
     "description": "Active window's display (active), all displays (all), or a native display id",
@@ -612,6 +617,11 @@
     "description": "Maximum screenshot width in pixels",
     "type": "number",
     "value": 3840
+  },
+  "computer.takeover": {
+    "description": "When window input takes over (the real pointer and keyboard; your Escape stops it) instead of running in the background",
+    "type": "enum",
+    "value": "fallback"
   },
   "contextFiles.extra": {
     "description": "Extra instruction filenames loaded beside AGENTS.md. Use a JSON list of names, not paths, e.g. [\"AGENTS.local.md\"]; [] disables extras. Start a new session to load them.",
@@ -643,7 +653,7 @@
     "value": "high"
   },
   "dev.autoqa": {
-    "description": "Automated tool issue reporting (xd://report_issue). On by default; the first report asks for consent, and denying it disables reporting until re-enabled explicitly",
+    "description": "Automated tool issue reporting (`report_issue`). On by default; the first report asks for consent, and denying it disables reporting until re-enabled explicitly",
     "type": "boolean",
     "value": true
   },
@@ -670,6 +680,21 @@
     "description": "",
     "type": "array",
     "value": []
+  },
+  "disassembler.backend": {
+    "description": "Backend for analysis selectors in read and eval's dsm namespace; bare executable reads show metadata only. Auto uses IDA Pro when installed, else Ghidra (downloaded on first analysis); Binary Ninja is used only when selected",
+    "type": "enum",
+    "value": "auto"
+  },
+  "disassembler.idleCloseSec": {
+    "description": "Save and close unreferenced databases idle longer than this many seconds (0 = never); retained dsm handles stay open. The exec namespace resets on reopen",
+    "type": "number",
+    "value": 900
+  },
+  "disassembler.maxOpen": {
+    "description": "Most databases open at once per project (each is a disasm unit in omp ps, labelled with its backend and binary); opening another evicts an unreferenced idle one. Close retained dsm handles when done",
+    "type": "number",
+    "value": 4
   },
   "display.advisorCollapsedLines": {
     "description": "Maximum note lines a collapsed advisor card shows below its header (0 keeps the full preview; expand with the tool-output toggle)",
@@ -761,8 +786,12 @@
     "type": "number",
     "value": 0.95
   },
+  "edit.magic.model": {
+    "description": "Model selector or role alias (@slow) for the model that applies magic-mode changes, empty = smol role",
+    "type": "string"
+  },
   "edit.mode": {
-    "description": "Select the edit tool variant (replace, patch, hashline, or apply_patch); none removes the edit tool and keeps bash enabled",
+    "description": "Select the edit tool variant (replace, patch, hashline, or apply_patch); magic takes described changes that a fast model writes; none removes the edit tool and keeps bash enabled",
     "type": "enum",
     "value": "hashline"
   },
@@ -902,7 +931,7 @@
     "value": true
   },
   "find.enabled": {
-    "description": "Enable the find tool: natural-language search for files and line ranges, judged by the judge model role. Auto enables it only when the judge role resolves to a native TypeSafe jev model",
+    "description": "Enable the find tool: natural-language search for files and line ranges, judged by the judge model role. Auto enables it when the first usable judge is native",
     "type": "enum",
     "value": "auto"
   },
@@ -990,9 +1019,19 @@
     "value": true
   },
   "generate_image.enabled": {
-    "description": "Enable the generate_image tool (text-to-image generation and editing). Exposed as an xd:// device when tools.xdev is on.",
+    "description": "Enable the generate_image tool (text-to-image generation and editing). Mounted as a tool command when tools.commands is on.",
     "type": "boolean",
     "value": false
+  },
+  "ghidra.installDir": {
+    "description": "Ghidra 12+ install directory (contains Ghidra/application.properties); empty uses $GHIDRA_INSTALL_DIR, Homebrew, else a managed download under ~/.omp/ghidra",
+    "type": "string",
+    "value": ""
+  },
+  "ghidra.python": {
+    "description": "Python interpreter that can import pyghidra; empty uses a managed venv built from the install's bundled wheels",
+    "type": "string",
+    "value": ""
   },
   "git.enabled": {
     "description": "Show git branch, status, and PR information in the TUI and watch repository metadata.",
@@ -1194,25 +1233,10 @@
     "type": "enum",
     "value": "per-project-tagged"
   },
-  "ida.enabled": {
-    "description": "Open executables read with `read` in IDA Pro (idalib) and enable the `ida` tool; inert when no IDA install is found",
-    "type": "boolean",
-    "value": true
-  },
-  "ida.idleCloseSec": {
-    "description": "Save and close IDA databases idle longer than this many seconds (0 = never); the exec namespace resets on reopen",
-    "type": "number",
-    "value": 900
-  },
   "ida.installDir": {
     "description": "Directory containing libidalib, exported as IDADIR; empty auto-detects ($IDADIR, ida-config.json, standard install paths)",
     "type": "string",
     "value": ""
-  },
-  "ida.maxOpen": {
-    "description": "Most IDA databases (omp.ida.* daemons in omp ps) open at once per project; opening another saves and closes the least recently used idle one",
-    "type": "number",
-    "value": 4
   },
   "ida.python": {
     "description": "Python interpreter that can import ida_domain and idapro; empty auto-detects",
@@ -1341,9 +1365,17 @@
     "type": "boolean",
     "value": false
   },
+  "live.apiKey": {
+    "description": "Bearer key sent only to the live endpoint: a literal, an environment variable name, or !command",
+    "type": "string"
+  },
+  "live.endpoint": {
+    "description": "Base URL of an OpenAI Realtime WebRTC-compatible server (e.g. http://127.0.0.1:8080/v1) used for live voice instead of Codex; empty uses Codex",
+    "type": "string"
+  },
   "live.voice": {
-    "description": "Voice used by Codex-backed realtime voice sessions",
-    "type": "enum",
+    "description": "Voice of realtime voice sessions; a custom live endpoint may take other names (set in config)",
+    "type": "string",
     "value": "sol"
   },
   "loop.conditionTimeoutMs": {
@@ -1431,10 +1463,25 @@
     "type": "enum",
     "value": "notify"
   },
+  "mcp.builtinTransforms": {
+    "description": "Skip recognized MCP servers that omp's own tools replace (Codex's node_repl while eval runs JavaScript)",
+    "type": "boolean",
+    "value": true
+  },
   "mcp.enableProjectConfig": {
     "description": "Load .mcp.json/mcp.json from project root",
     "type": "boolean",
     "value": true
+  },
+  "mcp.evalNamespaces": {
+    "description": "Expose each MCP server as an eval global (github.create_issue(...)) instead of top-level tools or tool commands",
+    "type": "boolean",
+    "value": false
+  },
+  "mcp.idleStopMinutes": {
+    "description": "Stop a shared MCP server after this many minutes without use; it restarts on the next request",
+    "type": "number",
+    "value": 5
   },
   "mcp.notificationDebounceMs": {
     "description": "Debounce window in milliseconds for MCP resource updates before injecting them into the conversation",
@@ -1448,6 +1495,11 @@
   },
   "mcp.renderMarkdownResults": {
     "description": "Render non-JSON MCP text results as Markdown in the transcript",
+    "type": "boolean",
+    "value": true
+  },
+  "mcp.shared": {
+    "description": "Run MCP servers through the daemon so every omp instance shares one process per server and a cached tool catalog. Servers that hold a session keep one process per instance (falls back to private servers when unavailable)",
     "type": "boolean",
     "value": true
   },
@@ -1688,7 +1740,7 @@
     "value": true
   },
   "model.toolCallLoopGuard.exemptTools": {
-    "description": "Tool names, or xd:// device names of write dispatches (for example mcp__peers_wait), that may repeat consecutively without triggering the cross-turn loop guard",
+    "description": "Tool names, including tools run as commands through bash (for example mcp__peers_wait), that may repeat consecutively without triggering the cross-turn loop guard",
     "type": "array",
     "value": [
       "wait"
@@ -1750,7 +1802,7 @@
     "value": true
   },
   "ovnfs.path": {
-    "description": "ovnfs executable; unset looks for `ovnfs` on PATH. When it is found, ovnfs checkouts (copy-on-write views of a folder, ready in about a second at any size) serve every separate copy: the system prompt tells agents to open checkouts instead of git worktrees or copies, and isolated subagents (when allowed, with `isolation.backend` on auto) run in checkouts instead of native clones",
+    "description": "ovnfs executable; unset looks for `ovnfs` on PATH. When it is found, ovnfs checkouts (copy-on-write views of a folder, ready in about a second at any size) serve every separate copy: the system prompt tells agents to open checkouts instead of git worktrees or copies, and with `isolation.backend` on auto, isolated subagents (when allowed) run in checkouts instead of native clones and `/wt` moves the session into a checkout instead of a linked worktree",
     "type": "string"
   },
   "paste.largeMenuThreshold": {
@@ -1853,9 +1905,24 @@
     "value": "auto"
   },
   "providers.cacheWarming": {
-    "description": "Re-send the last request with a one-token output budget shortly before its prompt-cache entry expires",
+    "description": "Refresh the last request's prompt-cache entry shortly before it expires (Anthropic max_tokens 0 pre-warm, else a one-token replay)",
     "type": "enum",
     "value": "idle"
+  },
+  "providers.cacheWarmingCompactPercent": {
+    "description": "Share of the context window a prompt must reach before a long tool call may be bridged with compaction; the lower of this and the token limit applies",
+    "type": "number",
+    "value": 60
+  },
+  "providers.cacheWarmingCompactTokens": {
+    "description": "Prompt tokens from which a long tool call may be bridged with compaction; the lower of this and the window percent applies",
+    "type": "number",
+    "value": 150000
+  },
+  "providers.cacheWarmingStrategy": {
+    "description": "How a long tool call is bridged once refreshing stops paying: compact the history before the cache expires, or let it expire",
+    "type": "enum",
+    "value": "auto"
   },
   "providers.fetch": {
     "description": "Reader backend priority for the fetch/read URL tool",
@@ -1932,10 +1999,20 @@
     "type": "enum",
     "value": "default"
   },
+  "providers.webKeyless": {
+    "description": "Let web search and URL reading use third-party services without your credential: keyless Parallel, Exa, Firecrawl, Keenable, and Perplexity, the Jina reader, and scraped engines (Startpage, DuckDuckGo, Ecosia, Google, Mojeek, Hacker News). Off, only services you configured run.",
+    "type": "boolean",
+    "value": true
+  },
   "providers.webSearchTimeoutSeconds": {
     "description": "Hard timeout for each provider's search transport before web_search advances to the next fallback, in seconds (maximum 300)",
     "type": "number",
     "value": 60
+  },
+  "pty.notify": {
+    "description": "Notify when an interactive console (bash `pty`) is waiting on you",
+    "type": "enum",
+    "value": "on"
   },
   "python.interpreter": {
     "description": "Optional path to an exact Python executable. When set, automatic Python runtime discovery is skipped.",
@@ -2048,7 +2125,7 @@
     "value": "cooldown-expiry"
   },
   "retry.maxDelayMs": {
-    "description": "Maximum wait between retries, in ms. When the provider asks us to wait longer than this and no credential or model fallback succeeds, the request fails fast instead of sleeping (e.g. 3-hour Anthropic rate-limit windows). 0 disables the ceiling — to let the session auto-resume through provider-stated quota resets.",
+    "description": "Maximum wait between retries, in ms. When the retry would wait longer and no credential or model fallback succeeds, the request fails fast instead of sleeping (e.g. 3-hour Anthropic rate-limit windows). 0 disables the ceiling.",
     "type": "number",
     "value": 300000
   },
@@ -2083,7 +2160,7 @@
     "value": "confirm"
   },
   "retry.waitForUsageReset": {
-    "description": "When a provider reports usage-limit exhaustion with a reset time (5-hour or weekly quota windows on any provider), sleep until the reset instead of failing fast past retry.maxDelayMs. Waits are abortable (⎋) but also hold subagents, so leave off for unattended runs.",
+    "description": "Usage-limit waits within retry.maxDelayMs are already allowed. Enable this to also wait past that cap when the provider reports a reset time, such as a 5-hour or weekly quota window. Waits are abortable (⎋) but also hold subagents, so leave off for unattended runs.",
     "type": "boolean",
     "value": false
   },
@@ -2591,6 +2668,11 @@
     "type": "boolean",
     "value": true
   },
+  "task.crossInstance": {
+    "description": "Let other omp instances in this folder read agent outputs and send messages that can wake agents",
+    "type": "boolean",
+    "value": false
+  },
   "task.disabledAgents": {
     "description": "",
     "type": "array",
@@ -2607,7 +2689,7 @@
     "value": false
   },
   "task.enableLsp": {
-    "description": "Allow subagents spawned via the task tool to use the lsp tool. Off by default to keep subagents cheap; enable when LSP-aware delegation is worth the extra tokens.",
+    "description": "Run LSP formatting and diagnostics on subagent edits. Off by default to keep subagents cheap; the lsp tool stays available to them either way.",
     "type": "boolean",
     "value": false
   },
@@ -2692,7 +2774,7 @@
     "value": false
   },
   "task.structured": {
-    "description": "Expose outputSchema/schemaMode on the task tool and return subagent results through the yield tool, validated against caller or agent output schemas. Off: task subagents have no yield tool and return their final message as plain text, except agents whose definition sets structured: true. Eval agent()/workpool spawns always keep structured results.",
+    "description": "Expose outputSchema/schemaMode on the task tool and honor agent output schemas; a subagent with a schema returns its result through the yield tool, validated against it. Off: task subagents ignore schemas, except agents whose definition sets structured: true. A subagent without a schema has no yield tool and returns its final message. Eval agent()/workpool spawns always honor schemas.",
     "type": "boolean",
     "value": false
   },
@@ -2821,6 +2903,11 @@
     "type": "boolean",
     "value": true
   },
+  "todo.backend": {
+    "description": "Extension that the todo list is mirrored to; Native keeps it in the session only",
+    "type": "string",
+    "value": "native"
+  },
   "todo.eager": {
     "description": "How strongly to push automatic todo-list creation after the first message",
     "type": "enum",
@@ -2886,13 +2973,33 @@
     "type": "number",
     "value": 500
   },
+  "tools.commandDocs": {
+    "description": "Choose which mounted commands get their `--help` text inlined in the system prompt. Built-ins keeps core tools inline while MCP and extension tools stay on demand.",
+    "type": "enum",
+    "value": "catalog"
+  },
+  "tools.commandInline": {
+    "description": "When Tool Command Prompt Docs is Built-ins Only, also inline dynamic commands whose names match these glob patterns (for example mcp__context_mode_*). Catalog Only ignores this setting.",
+    "type": "array",
+    "value": []
+  },
+  "tools.commandNotices": {
+    "description": "Show a notice when MCP or extension tools are mounted or unmounted as commands; the model still learns of the change with its next prompt.",
+    "type": "boolean",
+    "value": true
+  },
+  "tools.commands": {
+    "description": "Mount rarely-used (discoverable) tools as bash commands with schema-derived `--help` instead of shipping their schemas on every request. Needs the bash tool: sessions without it keep every enabled tool top-level. Disable to expose every enabled tool top-level.",
+    "type": "boolean",
+    "value": true
+  },
   "tools.format": {
     "description": "Controls how tools are exposed to the model. Auto uses provider-native tool calls unless the selected model is marked as not supporting them, then falls back to the GLM owned dialect. Native forces provider-native tools; the other values force the named owned dialect.",
     "type": "enum",
     "value": "auto"
   },
   "tools.intentTracing": {
-    "description": "Ask the agent to describe the intent of each tool call before executing it",
+    "description": "Ask the agent to describe the intent of each tool call before executing it. Unset: on in the interactive TUI, off in print, RPC, ACP, and SDK sessions",
     "type": "boolean",
     "value": true
   },
@@ -2920,26 +3027,6 @@
     "description": "Maximum number of validated local reads allowed to run before normal dispatch.",
     "type": "number",
     "value": 2
-  },
-  "tools.xdev": {
-    "description": "Mount rarely-used (discoverable) tools under xd:// device URLs driven via read/write instead of shipping their schemas on every request. Sessions whose explicit tool list grants read but omits write mount devices through a device-only write transport (only local:// scratch stays writable besides devices). Disable to expose every enabled tool top-level.",
-    "type": "boolean",
-    "value": true
-  },
-  "tools.xdevDocs": {
-    "description": "Choose which mounted-device docs and schemas are inlined in the system prompt. Built-ins keeps core tools inline while MCP and extension tools stay on-demand.",
-    "type": "enum",
-    "value": "catalog"
-  },
-  "tools.xdevInlineDevices": {
-    "description": "When xd:// Prompt Docs is Built-ins Only, inline dynamic devices whose names match these glob patterns (for example mcp__context_mode_*). Catalog Only ignores this setting.",
-    "type": "array",
-    "value": []
-  },
-  "tools.xdevNotices": {
-    "description": "Show an `xd://: mounted …` notice when MCP or extension tools are mounted or unmounted. The model still learns of the change with its next prompt.",
-    "type": "boolean",
-    "value": true
   },
   "topK": {
     "description": "Sample from top-K tokens (-1 = provider default)",
@@ -3020,11 +3107,6 @@
     "description": "Color headings by level, bold and italic text, inline code, and table headers from the theme's ANSI palette. Off uses one heading color and plain bold/italic.",
     "type": "boolean",
     "value": true
-  },
-  "tui.completeScrollback": {
-    "description": "Send transcript rows pushed off screen by a growing HUD or dialog straight to scrollback; when it shrinks, blank rows sit between the transcript and the input until new output fills them",
-    "type": "boolean",
-    "value": false
   },
   "tui.hyperlinks": {
     "description": "Wrap paths and URLs in OSC 8 hyperlinks for terminal-native click-to-open (auto: detect support; off: never; always: unconditional)",
